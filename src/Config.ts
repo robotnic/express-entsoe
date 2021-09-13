@@ -296,7 +296,33 @@ export class Config {
         "10YES-REE------0": "Spain",
         "10YSE-1--------K": "Sweden",
         "10YCH-SWISSGRIDZ": "Switzerland"
+      },
+      colors: {
+        "B01": "#008000",
+        "B02": "brown",
+        "B04": "#f59705",
+        "B05": "#000000",
+        "B06": "#ee209f",
+        "B09": "#196fd7",
+        "B10": "blue",
+        "B10___in": "blue",
+        "B11": "#2289f2",
+        "B12": "#1e7ce5",
+        "B14": "red",
+        "B20": "#006e24",
+        "B15": "#008000",
+        "B16": "#fcd440",
+        "B17": "#004000",
+        "B18": "#7bf4ff",
+        "B19": "#77d8fe"
+      },
+      chartNames: {
+        "installed": "Installed Power",
+        "generation": "Generated Electricity",
+        "prices": "Day Ahead Prices",
+        "hydrofill": "Hydro Power Fill Level",
       }
+
     }
   }
 }

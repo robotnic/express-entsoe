@@ -65,6 +65,7 @@ export class Entsoe {
     });
 
 
+
     router.get(`${basePath}/:country/cached/installed`, async (req, res, next) => {
       const country = req.params.country;
       try {
@@ -78,10 +79,14 @@ export class Entsoe {
 
     router.get(`${basePath}/:country/cached/generation`, async (req, res, next) => {
       const country = req.params.country;
+      let psrType: string | undefined
+      if (typeof (req.query.psrType) === 'string') {
+        psrType = req.query.psrType;
+      }
       try {
         const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
         console.log(periodStart, periodEnd)
-        const data = await loader.getEntsoeData(country, 'generation', periodStart, periodEnd);
+        const data = await loader.getEntsoeData(country, 'generation', periodStart, periodEnd, psrType);
         this.send(req, res, data, cacheDir);
       } catch (e: any) {
         this.errorHandler(res, e);
@@ -131,7 +136,7 @@ export class Entsoe {
     router.get(`${basePath}/:country/installed`, async (req, res, next) => {
       const country = req.params.country;
       try {
-    
+
         const [periodStart, periodEnd] = Datevalidator.parsePeriod(req.query);
         const data = await loader.getInstalled(country, periodStart, periodEnd);
         this.send(req, res, data, cacheDir);
@@ -232,7 +237,7 @@ export class Entsoe {
   }
 
   static send(req: express.Request, res: express.Response, data: any, cacheDir: string) {
-    const buf = Buffer.from(JSON.stringify(data), 'utf-8'); 
+    const buf = Buffer.from(JSON.stringify(data), 'utf-8');
     gzip(buf, (_, result) => {
       res.set('etag', (new Date()).getTime() + '');  //assuming the file will be writen in same second
       if (req.get('accept-encoding')?.indexOf('gzip') !== -1) {

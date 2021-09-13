@@ -4,43 +4,18 @@ import { Chart, ChartGroup, Point } from "./interfaces/charts";
 import { Entsoe, EntsoeDocument, EntsoePeriod, EntsoePoint } from "./interfaces/entsoe";
 import { Config } from "./Config";
 import { Duration, Period, ZonedDateTime } from 'js-joda';
-import { addSeconds, getDaysInMonth } from 'date-fns';
+import { addSeconds, differenceInDays, format, getISOWeek, parse } from 'date-fns';
 import { InputError } from './Errors';
-import QueryString from "qs";
-import e from "express";
+import { getUnpackedSettings } from "http2";
 
 
 export class Loader {
   config = Config.get();
   yearRegExp = new RegExp('^\\d{4}$');
+  order = ["A05", "B20", "B17", "B1", "B11", "B14", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B12", "B13", "B15", "B16", "B18", "B19"]
 
-  constructor(private securityToke: string, private entsoeDomain: string) {}
 
-  async loadCachedInstalled(country: string, query: QueryString.ParsedQs) {
-    this.checkCountry(country);
-    this.checkYear(query.year);
-    const periodStart = `${query.year}01010000`;
-    const periodEnd = `${query.year}12310000`;
-    return await this.getInstalled(country, periodStart, periodEnd);
-  }
-
-  async loadInstalled(country: string, query: QueryString.ParsedQs) {
-    this.checkCountry(country);
-    const periodStart = this.getPeriod(query.periodStart);
-    const periodEnd = this.getPeriod(query.periodEnd);
-    return await this.getInstalled(country, periodStart, periodEnd);
-  }
-
-  getPeriod(period: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined): string {
-    if (typeof (period) !== 'string') {
-      throw new InputError('period should be a string');
-    }
-    if (period.length !== 12) {
-      throw new InputError('period should have 12 character. Example: 201611012300');
-    }
-    return period;
-  }
-
+  constructor(private securityToke: string, private entsoeDomain: string) { }
   async getInstalled(country: string, periodStart: string, periodEnd: string) {
     const year = periodStart.substring(0, 4);
     const charts = await this.getEntsoeData(country, 'installed', periodStart, periodEnd);
@@ -57,51 +32,12 @@ export class Loader {
         countryCode: country,
         year: year,
         unit: 'MW',
-        source: `${this.entsoeDomain}${charts?.source}`,
+        source: `${charts?.source}`,
         data: data,
       }
       return response
     }
   }
-
-  async loadCachedChart(country: string, type: string, query: QueryString.ParsedQs) {
-    this.checkCountry(country);
-    const year = this.checkYear(query.year);
-    let periodStart = `${query.year}01010000`;
-    let periodEnd = `${query.year}12310000`;
-    const month = this.checkMonth(query.month);
-    if (month) {
-      if (query.week) {
-        throw new InputError('query parameter month and week cannot be used at the same time');
-      }
-      const day = this.checkDay(year, month, query.day);
-    } else {
-      if (query.week) {
-        const month = this.checkWeek(query.week);
-      }
-    }
-
-    let psrType;
-    if (typeof (query.psrType) === 'string') {
-      psrType = query.psrType;
-    }
-    const data = await this.getEntsoeData(country, type, periodStart, periodEnd, psrType);
-    return data;
-  }
-
-
-  async loadChart(country: string, type: string, query: QueryString.ParsedQs) {
-    this.checkCountry(country);
-    const periodStart = this.getPeriod(query.periodStart);
-    const periodEnd = this.getPeriod(query.periodEnd);
-    let psrType;
-    if (typeof (query.psrType) === 'string') {
-      psrType = query.psrType;
-    }
-    const data = await this.getEntsoeData(country, type, periodStart, periodEnd, psrType);
-    return data;
-  }
-
   async getCountries() {
     return Object.keys(this.config.CountryCodes).map(item => {
       return {
@@ -119,52 +55,6 @@ export class Loader {
       }
     })
   }
-
-
-  checkYear(year: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined) {
-    if (typeof (year) !== 'string') {
-      throw new InputError('query parameter year required');
-    }
-    if (!this.yearRegExp.test(year)) {
-      throw new InputError('query parameter year must have four digits. Example: 2019');
-    }
-    return year;
-  }
-
-  checkMonth(month: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined) {
-    if (typeof (month) !== 'string') {
-      throw new InputError('query parameter year required');
-    }
-    if (parseInt(month as any) < 1 || parseInt(month) > 12) {
-      throw new InputError('query parameter month must be between 1 and 12. Example: 7');
-    }
-    return (month + '').padStart(2, '0');
-  }
-
-  checkDay(year: string, month: string, day: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined) {
-    if (typeof (day) !== 'string') {
-      throw new InputError('query parameter day is fishy');
-    }
-    const daysInMonth = getDaysInMonth(new Date(parseInt(year), parseInt(month) - 1));
-    if (parseInt(day) > daysInMonth || parseInt(day) < 1) {
-      throw new InputError(`${year}-${month} does not have day ${day}`);
-    }
-    console.log(daysInMonth);
-    return (day + '').padStart(2, '0');
-  }
-
-  checkWeek(week: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined) {
-    if (typeof (week) !== 'string') {
-      throw new InputError('query parameter day is fishy');
-    }
-    if (parseInt(week) < 1 || parseInt(week) > 52) {
-      throw new InputError('value for week must be between 1 and 52');
-    }
-    return parseInt(week);
-  }
-
-
-
 
   checkCountry(country: string) {
     if (!this.config.CountryCodes[country]) {
@@ -221,12 +111,26 @@ export class Loader {
       path = `${path}&psrType=${psrType}`
     }
     const url = `${this.entsoeDomain}${path}&securityToken=${this.securityToke}`;
+    const source = `${this.entsoeDomain}${path}&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`;
     console.log(url);
+    const start = this.getUTC(periodStart);
+    const end = this.getUTC(periodEnd);
+    const hrDate = this.makeHrDate(start, end);
+    const countryName= this.config.CountryCodes[country];
+    const chartName= this.config.chartNames[chartType];
 
     let chartView: ChartGroup = {
-      title: title,
-      source: path,
+      title: `${country} ${chartName} ${hrDate}`,
+      chartName: chartName,
+      chartType: chartType,
+      country: countryName,
+      hrDate: hrDate,
+      source: source,
       unit: unit,
+      period: {
+        start: start.toISOString(),
+        end: end.toISOString()
+      },
       chartData: []
     }
     let response;
@@ -274,7 +178,7 @@ export class Loader {
         const x = addSeconds(start, durationInSeconds * i++);
         const y = this.getYValue(item, sign);
         return {
-          x: x.getTime(),
+          x: x.toISOString(),
           y: y
         }
       })
@@ -288,7 +192,7 @@ export class Loader {
       chartsByPsrType[psrType].data = chartsByPsrType[psrType].data.concat(data);
     });
     for (let key of Object.keys(chartsByPsrType)) {
-      const isAllZero = chartsByPsrType[key].data.every(item => item.y === 0);
+      const isAllZero = chartsByPsrType[key].data.every(item => Math.abs(item.y) < 10);
       if (!isAllZero) {
         const theKey = key.split('___')[0];
         if (key.endsWith('___in')) {
@@ -296,12 +200,16 @@ export class Loader {
         } else {
           chartsByPsrType[key].label = this.config.PsrType[theKey];
         }
-        chartsByPsrType[key].prsType = key;
+        chartsByPsrType[key].color = this.config.colors[key];
+        chartsByPsrType[key].prsType = theKey;
         charts.push(chartsByPsrType[key]);
 
       }
     }
-    return charts;
+    const sortedCharts = charts.sort((a, b) => {
+      return this.order.indexOf(a?.prsType || '') - this.order.indexOf(b?.prsType || '');
+    })
+    return sortedCharts;
   }
 
   getYValue(item: EntsoePoint, sign: number): number {
@@ -324,5 +232,29 @@ export class Loader {
     }
 
   }
+  getUTC(period: string): Date {
+    return parse(period, 'yyyyMMddHHmm', new Date());
+  }
 
+
+  makeHrDate(start: Date, end: Date):string {
+    const days = differenceInDays(end, start);
+    let dateString = format(start, 'yyyy MMM dd') 
+    if (days > 2) {
+      let year = format(start, 'yyyy')
+      let monthStart = format(start, 'MMM')
+      let monthEnd = format(end, 'MMM')
+      dateString = `${year} ${monthStart} ${format(start,'dd')} - ${monthEnd} ${format(end, 'dd')}`
+    }
+    if (days > 8) {
+      dateString = format(start, 'yyyy MMM') 
+    }
+
+    if (days > 40) {
+      dateString = format(start, 'yyyy') 
+    }
+    const title = `${dateString}`;
+    return title;
+
+  };
 }

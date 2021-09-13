@@ -128,7 +128,7 @@ export class CreateSwagger {
                 "content": {
                   "application/json": {
                     "schema": {
-                      "$ref": "#/components/schemas/Installed"
+                      "$ref": "#/components/schemas/InstalledGeneration"
                     }
                   }
                 }
