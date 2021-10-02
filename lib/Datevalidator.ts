@@ -4,7 +4,7 @@ import { Chart, ChartGroup, Point } from "./interfaces/charts";
 import { Entsoe, EntsoeDocument, EntsoePeriod, EntsoePoint } from "./interfaces/entsoe";
 import { Config } from "./Config";
 import { Duration, Period, ZonedDateTime } from 'js-joda';
-import { addDays, addMonths, addSeconds, addWeeks, addYears, format, getDaysInMonth, setDate, setDay, setISOWeek, setMonth, startOfWeek } from 'date-fns';
+import { addDays, addHours, addMonths, addSeconds, addWeeks, addYears, format, getDaysInMonth, setDate, setDay, setISOWeek, setMonth, startOfWeek } from 'date-fns';
 import { InputError } from './Errors';
 import QueryString from "qs";
 import e from "express";
@@ -48,8 +48,8 @@ export class Datevalidator {
           endDate = addWeeks(startDate, 1);
         }
       }
-      const periodStart = format(startDate, 'yyyyMMdd0000')
-      const periodEnd = format(endDate, 'yyyyMMdd0000')
+      const periodStart = format(startDate, 'yyyyMMddHH00')
+      const periodEnd = format(endDate, 'yyyyMMddHH00')
       return [periodStart, periodEnd]
     } else {
       return this.parsePeriod(query);

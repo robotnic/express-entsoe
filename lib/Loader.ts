@@ -20,6 +20,9 @@ export class Loader {
   async getInstalled(country: string, periodStart: string, periodEnd: string) {
     const year = periodStart.substring(0, 4);
     const charts = await this.getEntsoeData(country, 'installed', periodStart, periodEnd);
+    const chartType = 'installed';
+    const chartName = this.config.chartNames[chartType];
+
     if (charts) {
       const data = charts.chartData.map(item => {
         return {
@@ -31,6 +34,8 @@ export class Loader {
       const response = {
         title: `Installed ${this.config.CountryCodes[country]} ${year}`,
         countryCode: country,
+        chartType: chartType,
+        chartName: chartName,
         year: year,
         unit: 'MW',
         source: `${charts?.source}`,
@@ -72,6 +77,21 @@ export class Loader {
 
   }
 
+  periodToDate(period: string): Date {
+    const isoDate = `${period.substr(0, 4)}-${period.substr(4, 2)}-${period.substr(6, 2)}T00:00Z`;
+    return new Date(isoDate);
+  }
+
+  makeRequestedPeriod(periodStart: string, periodEnd: string): { start: string, end: string } {
+    const start = this.periodToDate(periodStart).toISOString();
+    const end = this.periodToDate(periodEnd).toISOString();
+
+    return {
+      start: start,
+      end: end
+    }
+  }
+
 
   async getEntsoeData(country: string, chartType: string, periodStart: string, periodEnd: string, psrType?: string): Promise<ChartGroup | undefined> {
     let path = '';
@@ -104,8 +124,8 @@ export class Loader {
         unit = 'MWh';
         break;
       case 'installed':
-        path = `/api?documentType=A68&processType=A33&in_Domain=${country}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
         title = 'installed'
+        path = `/api?documentType=A68&processType=A33&in_Domain=${country}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
         unit = 'MW';
         break;
 
@@ -122,6 +142,7 @@ export class Loader {
 
     let response;
     try {
+//      console.log(url);
       response = await axios.get(url);
     } catch (e: any) {
       //console.trace(e.response.data);
@@ -138,18 +159,16 @@ export class Loader {
       } else {
         [chartData, start, end] = this.convert(json.GL_MarketDocument);
       }
-      const hrDate = this.makeHrDate(new Date(start||''), new Date(end||''));
+      const hrDate = this.makeHrDate(new Date(start || ''), new Date(end || ''));
       let chartView: ChartGroup = {
         chartName: chartName,
         chartType: chartType,
         country: countryName,
         source: source,
         unit: unit,
-        period: {
-          start: start,
-          end: end
-        },
-        hrDate: hrDate,
+        requestInterval: this.makeRequestedPeriod(periodStart, periodEnd),
+        dataInterval: { start: start, end: end },
+        humanReadableDate: hrDate,
         title: `${country} ${chartName} ${hrDate}`,
 
 
@@ -159,7 +178,7 @@ export class Loader {
     }
   }
 
-  convert(orig?: EntsoeDocument): [Chart[], string|undefined, string|undefined] {
+  convert(orig?: EntsoeDocument): [Chart[], string | undefined, string | undefined] {
     const timePeriod = orig?.['time_Period.timeInterval'] || orig?.['period.timeInterval'];
     const start = timePeriod?.[0].start[0];
     const end = timePeriod?.[0].end[0];

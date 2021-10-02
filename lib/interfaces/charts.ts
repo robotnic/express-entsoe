@@ -1,13 +1,14 @@
 export interface ChartGroup {
   title: string
   country: string
-  hrDate: string
+  humanReadableDate: string
   chartType: string
   chartName: string
   unit?: string
   chartData: Chart[]
   source: string
-  period: Period
+  requestInterval:Interval
+  dataInterval:Interval
 }
 
 export interface Chart {
@@ -22,7 +23,7 @@ export interface Point {
   y: number
 }
 
-export interface Period {
+export interface Interval {
   start?: string
   end?: string
 }

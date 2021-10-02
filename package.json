@@ -1,6 +1,6 @@
 {
   "name": "express-entsoe",
-  "version": "0.2.2",
+  "version": "0.2.6",
   "main": "dist/index.js",
   "scripts": {
     "test": "jasmine --config=spec/jasmine.json",
@@ -12,15 +12,9 @@
   "description": "",
   "dependencies": {
     "axios": "^0.21.1",
-    "cors": "^2.8.5",
     "date-fns": "^2.23.0",
     "express": "^4.17.1",
-    "file-system-cache": "^1.0.5",
-    "flat-cache": "^3.0.4",
-    "jasmine-node": "^3.0.0",
     "js-joda": "^1.11.0",
-    "node-fetch": "^3.0.0",
-    "supertest": "^6.1.6",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
@@ -38,6 +32,8 @@
     "jasmine-ts": "^0.4.0",
     "openapi-types": "^9.3.0",
     "ts-node": "^10.2.1",
-    "typescript": "^4.4.2"
+    "typescript": "^4.4.2",
+    "supertest": "^6.1.6",
+    "node-fetch": "^3.0.0"
   }
 }
