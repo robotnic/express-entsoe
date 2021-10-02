@@ -2,15 +2,16 @@ import axios, { AxiosError } from "axios";
 import { parseStringPromise } from 'xml2js';
 import { Chart, ChartGroup, Point } from "./interfaces/charts";
 import { Entsoe, EntsoeDocument, EntsoePeriod, EntsoePoint } from "./interfaces/entsoe";
-import { Config } from "./Config";
+import { Config, ConfigType } from "./Config";
 import { Duration, Period, ZonedDateTime } from 'js-joda';
 import { addSeconds, differenceInDays, format, getISOWeek, parse } from 'date-fns';
 import { InputError } from './Errors';
 import { getUnpackedSettings } from "http2";
+import { start } from "repl";
 
 
 export class Loader {
-  config = Config.get();
+  config: ConfigType = Config.get();
   yearRegExp = new RegExp('^\\d{4}$');
   order = ["A05", "B20", "B17", "B1", "B11", "B14", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B12", "B13", "B15", "B16", "B18", "B19"]
 
@@ -68,7 +69,6 @@ export class Loader {
 
   getDateTimeString(zondedDateTime: any) {
     const date = ZonedDateTime.parse(zondedDateTime);
-    console.log(date);
 
   }
 
@@ -77,12 +77,16 @@ export class Loader {
     let path = '';
     let title = '';
     let unit = '';
-    console.log(chartType);
     switch (chartType) {
       case 'generation':
         title = 'power generation';
         unit = 'MW';
         path = `/api?documentType=A75&processType=A16&in_Domain=${country}&outBiddingZone_Domain=${country}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
+        break;
+      case 'generation_per_plant':
+        title = 'power generation per plant';
+        unit = 'MW';
+        path = `/api?documentType=A73&processType=A16&in_Domain=${country}&outBiddingZone_Domain=${country}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
         break;
       case 'load':
         title = 'total load'
@@ -112,27 +116,10 @@ export class Loader {
     }
     const url = `${this.entsoeDomain}${path}&securityToken=${this.securityToke}`;
     const source = `${this.entsoeDomain}${path}&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`;
-    console.log(url);
-    const start = this.getUTC(periodStart);
-    const end = this.getUTC(periodEnd);
-    const hrDate = this.makeHrDate(start, end);
-    const countryName= this.config.CountryCodes[country];
-    const chartName= this.config.chartNames[chartType];
+    const countryName = this.config.CountryCodes[country];
+    const chartName = this.config.chartNames[chartType];
 
-    let chartView: ChartGroup = {
-      title: `${country} ${chartName} ${hrDate}`,
-      chartName: chartName,
-      chartType: chartType,
-      country: countryName,
-      hrDate: hrDate,
-      source: source,
-      unit: unit,
-      period: {
-        start: start.toISOString(),
-        end: end.toISOString()
-      },
-      chartData: []
-    }
+
     let response;
     try {
       response = await axios.get(url);
@@ -141,24 +128,41 @@ export class Loader {
       return e.response;
     }
     if (response) {
-      console.log('.')
       //      console.log(response.data);
       const json = await parseStringPromise(response.data) as Entsoe;
+      let chartData;
+      let start;
+      let end;
       if (chartType === 'prices') {
-        chartView.chartData = this.convert(json.Publication_MarketDocument);
+        [chartData, start, end] = this.convert(json.Publication_MarketDocument);
       } else {
-        chartView.chartData = this.convert(json.GL_MarketDocument);
+        [chartData, start, end] = this.convert(json.GL_MarketDocument);
       }
-      /*
-      if (chartType === 'filllevel') {
-        chartView.chartData = this.combine(chartView.chartData);
+      const hrDate = this.makeHrDate(new Date(start||''), new Date(end||''));
+      let chartView: ChartGroup = {
+        chartName: chartName,
+        chartType: chartType,
+        country: countryName,
+        source: source,
+        unit: unit,
+        period: {
+          start: start,
+          end: end
+        },
+        hrDate: hrDate,
+        title: `${country} ${chartName} ${hrDate}`,
+
+
+        chartData: chartData
       }
-      */
       return chartView;
     }
   }
 
-  convert(orig?: EntsoeDocument) {
+  convert(orig?: EntsoeDocument): [Chart[], string|undefined, string|undefined] {
+    const timePeriod = orig?.['time_Period.timeInterval'] || orig?.['period.timeInterval'];
+    const start = timePeriod?.[0].start[0];
+    const end = timePeriod?.[0].end[0];
     const charts: Chart[] = [];
     const chartsByPsrType: {
       [key: string]: Chart
@@ -209,7 +213,7 @@ export class Loader {
     const sortedCharts = charts.sort((a, b) => {
       return this.order.indexOf(a?.prsType || '') - this.order.indexOf(b?.prsType || '');
     })
-    return sortedCharts;
+    return [sortedCharts, start, end];
   }
 
   getYValue(item: EntsoePoint, sign: number): number {
@@ -237,21 +241,21 @@ export class Loader {
   }
 
 
-  makeHrDate(start: Date, end: Date):string {
+  makeHrDate(start: Date, end: Date): string {
     const days = differenceInDays(end, start);
-    let dateString = format(start, 'yyyy MMM dd') 
+    let dateString = format(start, 'yyyy MMM dd')
     if (days > 2) {
       let year = format(start, 'yyyy')
       let monthStart = format(start, 'MMM')
       let monthEnd = format(end, 'MMM')
-      dateString = `${year} ${monthStart} ${format(start,'dd')} - ${monthEnd} ${format(end, 'dd')}`
+      dateString = `${year} ${monthStart} ${format(start, 'dd')} - ${monthEnd} ${format(end, 'dd')}`
     }
     if (days > 8) {
-      dateString = format(start, 'yyyy MMM') 
+      dateString = format(start, 'yyyy MMM')
     }
 
     if (days > 40) {
-      dateString = format(start, 'yyyy') 
+      dateString = format(start, 'yyyy')
     }
     const title = `${dateString}`;
     return title;

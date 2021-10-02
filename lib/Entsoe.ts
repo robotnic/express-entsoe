@@ -38,13 +38,13 @@ export class Entsoe {
 
 
     const loader = new Loader(config.securityToken, entsoeDomain);
-    var router = express.Router();
+    const router = express.Router();
 
     router.use(async (req, res, next) => {
       const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
       const fileDirName = path.join(cacheDir, fileName);
       stat(fileDirName, (err, stats) => {
-        if (err) {
+        if (err || req.get('refresh') === 'true') {
           next();
         } else {
           const fileTime = (new Date(stats.mtime)).getTime() + '';
@@ -85,7 +85,6 @@ export class Entsoe {
       }
       try {
         const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
-        console.log(periodStart, periodEnd)
         const data = await loader.getEntsoeData(country, 'generation', periodStart, periodEnd, psrType);
         this.send(req, res, data, cacheDir);
       } catch (e: any) {
@@ -93,11 +92,26 @@ export class Entsoe {
       }
     })
 
+    router.get(`${basePath}/:country/cached/generation_per_plant`, async (req, res, next) => {
+      const country = req.params.country;
+      let psrType: string | undefined
+      if (typeof (req.query.psrType) === 'string') {
+        psrType = req.query.psrType;
+      }
+      try {
+        const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
+        const data = await loader.getEntsoeData(country, 'generation_per_plant', periodStart, periodEnd, psrType);
+        this.send(req, res, data, cacheDir);
+      } catch (e: any) {
+        this.errorHandler(res, e);
+      }
+    })
+
+
     router.get(`${basePath}/:country/cached/prices`, async (req, res, next) => {
       const country = req.params.country;
       try {
         const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
-        console.log(periodStart, periodEnd)
         const data = await loader.getEntsoeData(country, 'prices', periodStart, periodEnd);
         this.send(req, res, data, cacheDir);
       } catch (e: any) {
@@ -109,7 +123,6 @@ export class Entsoe {
       const country = req.params.country;
       try {
         const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
-        console.log(periodStart, periodEnd)
         const data = await loader.getEntsoeData(country, 'hydrofill', periodStart, periodEnd);
         this.send(req, res, data, cacheDir);
       } catch (e: any) {
@@ -121,7 +134,6 @@ export class Entsoe {
       const country = req.params.country;
       try {
         const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
-        console.log(periodStart, periodEnd)
         const data = await loader.getEntsoeData(country, 'load', periodStart, periodEnd);
         this.send(req, res, data, cacheDir);
       } catch (e: any) {
@@ -161,7 +173,6 @@ export class Entsoe {
 
     router.get(`${basePath}/:country/prices`, async (req, res, next) => {
       const country = req.params.country;
-      console.log(country, req.query);
       try {
         const [periodStart, periodEnd] = Datevalidator.parsePeriod(req.query);
         const data = await loader.getEntsoeData(country, 'prices', periodStart, periodEnd);
@@ -250,7 +261,9 @@ export class Entsoe {
       const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
       const fileDirName = path.join(cacheDir, fileName);
       writeFile(fileDirName, result, (e) => {
-        console.log(e);
+        if (e) {
+          console.log(e);
+        }
       })
     });
   }

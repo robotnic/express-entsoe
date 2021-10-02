@@ -23,6 +23,6 @@ export interface Point {
 }
 
 export interface Period {
-  start: string
-  end: string
+  start?: string
+  end?: string
 }

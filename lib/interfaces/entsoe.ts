@@ -4,7 +4,9 @@ export interface Entsoe {
 }
 
 export interface EntsoeDocument {
-  TimeSeries: TimeSeries[]
+  TimeSeries: TimeSeries[],
+  'period.timeInterval'?: TimeInterval[]
+  'time_Period.timeInterval'?: TimeInterval[]
 }
 
 interface TimeSeries {

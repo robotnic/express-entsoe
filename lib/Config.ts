@@ -1,4 +1,4 @@
-interface ConfigType {
+export interface ConfigType {
   [key: string]: ConfigItem
 }
 

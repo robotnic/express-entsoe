@@ -4,14 +4,14 @@ import { Chart, ChartGroup, Point } from "./interfaces/charts";
 import { Entsoe, EntsoeDocument, EntsoePeriod, EntsoePoint } from "./interfaces/entsoe";
 import { Config } from "./Config";
 import { Duration, Period, ZonedDateTime } from 'js-joda';
-import { addDays, addMonths, addSeconds, addWeeks, addYears, format, getDaysInMonth, setDay, setMonth, setWeek } from 'date-fns';
+import { addDays, addMonths, addSeconds, addWeeks, addYears, format, getDaysInMonth, setDate, setDay, setISOWeek, setMonth, startOfWeek } from 'date-fns';
 import { InputError } from './Errors';
 import QueryString from "qs";
 import e from "express";
 
 
 export class Datevalidator {
-  static parsePeriod(query: QueryString.ParsedQs) {
+  static parsePeriod(query: QueryString.ParsedQs): [string, string] {
     return [
       this.getPeriod(query.periodStart),
       this.getPeriod(query.periodEnd)
@@ -23,39 +23,40 @@ export class Datevalidator {
     const periodEnd = `${query.year}12310000`;
     return [periodStart, periodEnd]
   }
-  static getStartEnd(query: QueryString.ParsedQs):[string,string] {
+  static getStartEnd(query: QueryString.ParsedQs): [string, string] {
     const year = this.checkYear(query.year);
-    let startDate = new Date(year);
-    let endDate = addYears(startDate,1);
-    console.log(startDate);
-    const month = this.checkMonth(query.month);
-    if (month) {
-      if (query.week) {
-        throw new InputError('query parameter month and week cannot be used at the same time');
+    if (year) {
+      let startDate = new Date(year);
+      let endDate = addYears(startDate, 1);
+      const month = this.checkMonth(query.month);
+      if (typeof (month) === 'number') {
+        if (query.week) {
+          throw new InputError('query parameter month and week cannot be used at the same time');
+        }
+        startDate = setMonth(startDate, month)
+        endDate = addMonths(startDate, 1);
+        const day = this.checkDay(year, month, query.day);
+        if (day) {
+          startDate = setDate(startDate, day)
+          endDate = addDays(startDate, 1);
+        }
+      } else {
+        if (query.week) {
+          const week = this.checkWeek(query.week);
+          startDate = addMonths(startDate, 1);
+          startDate = startOfWeek(setISOWeek(startDate, week));
+          endDate = addWeeks(startDate, 1);
+        }
       }
-      startDate = setMonth(startDate, month)
-      endDate = addMonths(startDate,1);
-      console.log(startDate);
-      const day = this.checkDay(year, month, query.day);
-      if (day) {
-        startDate = setDay(startDate, day)
-        endDate = addDays(startDate,1);
-        console.log(startDate);
-      }
+      const periodStart = format(startDate, 'yyyyMMdd0000')
+      const periodEnd = format(endDate, 'yyyyMMdd0000')
+      return [periodStart, periodEnd]
     } else {
-      if (query.week) {
-        const week = this.checkWeek(query.week);
-        startDate = setWeek(startDate, week);
-        endDate = addWeeks(startDate,1);
-      }
+      return this.parsePeriod(query);
     }
-    console.log(startDate);
-    const periodStart = format(startDate, 'yyyyMMdd0000')
-    const periodEnd = format(endDate, 'yyyyMMdd0000')
-    return  [periodStart, periodEnd]
   }
 
-  static  getPeriod(period: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined): string {
+  static getPeriod(period: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined): string {
     if (typeof (period) !== 'string') {
       throw new InputError('period should be a string');
     }
@@ -67,10 +68,8 @@ export class Datevalidator {
 
 
   static checkYear(year: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined) {
-    console.log(year, typeof(year));
     const yearRegExp = new RegExp('^\\d{4}$');
     if (typeof (year) !== 'string') {
-      console.log('really?');
       throw new InputError('query parameter year required');
     }
     if (!yearRegExp.test(year)) {
@@ -82,8 +81,8 @@ export class Datevalidator {
   static checkMonth(month: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined) {
     if (!month) {
       return;
-    } 
-    if (typeof(month) !== 'string') {
+    }
+    if (typeof (month) !== 'string') {
       throw new InputError('month has to be a string');
     }
     if (parseInt(month as any) < 1 || parseInt(month) > 12) {
@@ -103,7 +102,6 @@ export class Datevalidator {
     if (parseInt(day) > daysInMonth || parseInt(day) < 1) {
       throw new InputError(`${year}-${month} does not have day ${day}`);
     }
-    console.log(daysInMonth);
     return parseInt(day);
   }
 
@@ -117,3 +115,4 @@ export class Datevalidator {
     return parseInt(week);
   }
 }
+
