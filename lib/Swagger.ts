@@ -92,7 +92,7 @@ export class CreateSwagger {
             }
           }
         },
-        [`${basePath}/{country}/cached/installed`]: {
+        [`${basePath}/{country}/installed`]: {
           "get": {
             "description": "",
             "operationId": "getInstalled",
@@ -146,7 +146,7 @@ export class CreateSwagger {
             }
           }
         },
-        [`${basePath}/{country}/cached/generation`]: {
+        [`${basePath}/{country}/generation`]: {
           "get": {
             "description": "",
             "operationId": "getGeneration",
@@ -236,7 +236,7 @@ export class CreateSwagger {
             }
           }
         },
-        [`${basePath}/{country}/cached/prices`]: {
+        [`${basePath}/{country}/prices`]: {
           "get": {
             "description": "",
             "operationId": "getCachedPrices",
@@ -326,7 +326,7 @@ export class CreateSwagger {
             }
           }
         },
-        [`${basePath}/{country}/cached/hydrofill`]: {
+        [`${basePath}/{country}/hydrofill`]: {
           "get": {
             "description": "",
             "operationId": "getCachedHydrofill",
@@ -415,7 +415,7 @@ export class CreateSwagger {
             }
           }
         },
-       [`${basePath}/{country}/cached/load`]: {
+       [`${basePath}/{country}/load`]: {
           "get": {
             "description": "",
             "operationId": "getCachedLoad",
@@ -506,7 +506,7 @@ export class CreateSwagger {
           }
         },
  
-        [`${basePath}/{country}/cached/prices`]: {
+        [`${basePath}/{country}/prices`]: {
           "get": {
             "description": "",
             "operationId": "getCachedPrices",
@@ -597,338 +597,7 @@ export class CreateSwagger {
           }
         },
 
-
-        [`${basePath}/{country}/installed`]: {
-          "get": {
-            "description": "",
-            "operationId": "getInstalled",
-            "tags": [
-              "ENTSO-E Charts direct"
-            ],
-            "parameters": [
-              {
-                "name": "country",
-                "in": "path",
-                "description": "country code",
-                "required": true,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "10YAT-APG------L"
-              },
-              {
-                "name": "periodStart",
-                "in": "query",
-                "description": "start",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "201610012300"
-              },
-              {
-                "name": "periodEnd",
-                "in": "query",
-                "description": "end",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "201611012300"
-              }
-            ],
-            "responses": {
-              "200": {
-                "description": "installed generation",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "$ref": "#/components/schemas/InstalledGeneration"
-                    }
-                  }
-                }
-              },
-              "default": {
-                "description": "input error",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "$ref": "#/components/schemas/Error"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        [`${basePath}/{country}/generation`]: {
-          "get": {
-            "description": "",
-            "operationId": "getGeneration",
-            "tags": [
-              "ENTSO-E Charts direct"
-            ],
-            "parameters": [
-              {
-                "name": "country",
-                "in": "path",
-                "description": "country code",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "10YAT-APG------L"
-              },
-              {
-                "name": "periodStart",
-                "in": "query",
-                "description": "start",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "201611012300"
-              },
-              {
-                "name": "periodEnd",
-                "in": "query",
-                "description": "end",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "201611022300"
-              }, {
-                "name": "psrType",
-                "in": "query",
-                "description": "psrType, let empty for all generation types",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "B16"
-              }
-
-            ],
-            "responses": {
-              "200": {
-                "description": "installed generation",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "$ref": "#/components/schemas/ChartGroup"
-                    }
-                  }
-                }
-              },
-              "default": {
-                "description": "input error",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "$ref": "#/components/schemas/Error"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        [`${basePath}/{country}/prices`]: {
-          "get": {
-            "description": "",
-            "operationId": "getPrices",
-            "tags": [
-              "ENTSO-E Charts direct"
-            ],
-            "parameters": [
-              {
-                "name": "country",
-                "in": "path",
-                "description": "country code",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "10YAT-APG------L"
-              },
-              {
-                "name": "periodStart",
-                "in": "query",
-                "description": "start",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "201611012300"
-              },
-              {
-                "name": "periodEnd",
-                "in": "query",
-                "description": "end",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "201611022300"
-              }
-
-            ],
-            "responses": {
-              "200": {
-                "description": "installed generation",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "$ref": "#/components/schemas/ChartGroup"
-                    }
-                  }
-                }
-              },
-              "default": {
-                "description": "input error",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "$ref": "#/components/schemas/Error"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-
-        [`${basePath}/{country}/hydrofill`]: {
-          "get": {
-            "description": "",
-            "operationId": "getHydrofill",
-            "tags": [
-              "ENTSO-E Charts direct"
-            ],
-            "parameters": [
-              {
-                "name": "country",
-                "in": "path",
-                "description": "country code",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "10YAT-APG------L"
-              },
-              {
-                "name": "periodStart",
-                "in": "query",
-                "description": "start",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "201601010000"
-              },
-              {
-                "name": "periodEnd",
-                "in": "query",
-                "description": "end",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "201612312300"
-              }
-
-            ],
-            "responses": {
-              "200": {
-                "description": "installed generation",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "$ref": "#/components/schemas/ChartGroup"
-                    }
-                  }
-                }
-              },
-              "default": {
-                "description": "input error",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "$ref": "#/components/schemas/Error"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-
-        [`${basePath}/{country}/load`]: {
-          "get": {
-            "description": "",
-            "operationId": "getLoad",
-            "tags": [
-              "ENTSO-E Charts direct"
-            ],
-            "parameters": [
-              {
-                "name": "country",
-                "in": "path",
-                "description": "country code",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "10YAT-APG------L"
-              },
-              {
-                "name": "periodStart",
-                "in": "query",
-                "description": "start",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "201611012300"
-              },
-              {
-                "name": "periodEnd",
-                "in": "query",
-                "description": "end",
-                "required": false,
-                "schema": {
-                  "type": "string",
-                },
-                "example": "201611022300"
-              }
-
-            ],
-            "responses": {
-              "200": {
-                "description": "installed generation",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "$ref": "#/components/schemas/ChartGroup"
-                    }
-                  }
-                }
-              },
-              "default": {
-                "description": "input error",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "$ref": "#/components/schemas/Error"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-      },
+     },
 
 
 

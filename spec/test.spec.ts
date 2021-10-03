@@ -19,7 +19,7 @@ describe('Electricity Generation', () => {
 
   it('Electricity Generation Week Germany', done => {
     request.default(app)
-      .get('/entsoe/10Y1001A1001A83F/cached/generation?year=2019&week=19')
+      .get('/entsoe/10Y1001A1001A83F/generation?year=2019&week=19')
       .set('refresh', 'true')
       .timeout(60000)
       .expect(200)
@@ -38,7 +38,7 @@ describe('Electricity Generation', () => {
 
   it('Electricity Generation Day Germany', done => {
     request.default(app)
-      .get('/entsoe/10Y1001A1001A83F/cached/generation?year=2019&month=3&day=11')
+      .get('/entsoe/10Y1001A1001A83F/generation?year=2019&month=3&day=11')
       .set('refresh', 'true')
       .timeout(60000)
       .expect(200)
@@ -57,7 +57,7 @@ describe('Electricity Generation', () => {
 
   it('Electricity Generation Day Austria', done => {
     request.default(app)
-      .get('/entsoe/10YAT-APG------L/cached/generation?year=2019&month=3&day=11')
+      .get('/entsoe/10YAT-APG------L/generation?year=2019&month=3&day=11')
       .set('refresh', 'true')
       .timeout(60000)
       .expect(200)
@@ -76,7 +76,7 @@ describe('Electricity Generation', () => {
 
   it('Solar Generation Day Austria', done => {
     request.default(app)
-      .get('/entsoe/10YAT-APG------L/cached/generation?year=2019&month=3&day=11&psrType=B16')
+      .get('/entsoe/10YAT-APG------L/generation?year=2019&month=3&day=11&psrType=B16')
       .set('refresh', 'true')
       .timeout(60000)
       .expect(200)
@@ -95,7 +95,7 @@ describe('Electricity Generation', () => {
 
   it('Price Day Austria', done => {
     request.default(app)
-      .get('/entsoe/10YAT-APG------L/cached/prices?year=2021&month=3&day=11')
+      .get('/entsoe/10YAT-APG------L/prices?year=2021&month=3&day=11')
       .set('refresh', 'true')
       .timeout(60000)
       .expect(200)
@@ -114,7 +114,7 @@ describe('Electricity Generation', () => {
 
   it('Hydro fill Month Austria', done => {
     request.default(app)
-      .get('/entsoe/10YAT-APG------L/cached/hydrofill?year=2021&month=3')
+      .get('/entsoe/10YAT-APG------L/hydrofill?year=2021&month=3')
       .set('refresh', 'true')
       .timeout(60000)
       .expect(200)

@@ -66,7 +66,7 @@ export class Entsoe {
 
 
 
-    router.get(`${basePath}/:country/cached/installed`, async (req, res, next) => {
+    router.get(`${basePath}/:country/installed`, async (req, res, next) => {
       const country = req.params.country;
       try {
         const [periodStart, periodEnd] = Datevalidator.getYear(req.query);
@@ -77,7 +77,7 @@ export class Entsoe {
       }
     })
 
-    router.get(`${basePath}/:country/cached/generation`, async (req, res, next) => {
+    router.get(`${basePath}/:country/generation`, async (req, res, next) => {
       const country = req.params.country;
       let psrType: string | undefined
       if (typeof (req.query.psrType) === 'string') {
@@ -92,7 +92,7 @@ export class Entsoe {
       }
     })
 
-    router.get(`${basePath}/:country/cached/generation_per_plant`, async (req, res, next) => {
+    router.get(`${basePath}/:country/generation_per_plant`, async (req, res, next) => {
       const country = req.params.country;
       let psrType: string | undefined
       if (typeof (req.query.psrType) === 'string') {
@@ -108,76 +108,12 @@ export class Entsoe {
     })
 
 
-    router.get(`${basePath}/:country/cached/prices`, async (req, res, next) => {
-      const country = req.params.country;
-      try {
-        const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
-        const data = await loader.getEntsoeData(country, 'prices', periodStart, periodEnd);
-        this.send(req, res, data, cacheDir);
-      } catch (e: any) {
-        this.errorHandler(res, e);
-      }
-    })
-
-    router.get(`${basePath}/:country/cached/hydrofill`, async (req, res, next) => {
-      const country = req.params.country;
-      try {
-        const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
-        const data = await loader.getEntsoeData(country, 'hydrofill', periodStart, periodEnd);
-        this.send(req, res, data, cacheDir);
-      } catch (e: any) {
-        this.errorHandler(res, e);
-      }
-    })
-
-    router.get(`${basePath}/:country/cached/load`, async (req, res, next) => {
-      const country = req.params.country;
-      try {
-        const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
-        const data = await loader.getEntsoeData(country, 'load', periodStart, periodEnd);
-        this.send(req, res, data, cacheDir);
-      } catch (e: any) {
-        this.errorHandler(res, e);
-      }
-    })
-
-
-
-
-
-    router.get(`${basePath}/:country/installed`, async (req, res, next) => {
-      const country = req.params.country;
-      try {
-
-        const [periodStart, periodEnd] = Datevalidator.parsePeriod(req.query);
-        const data = await loader.getInstalled(country, periodStart, periodEnd);
-        this.send(req, res, data, cacheDir);
-        res.send(data);
-      } catch (e: any) {
-        this.errorHandler(res, e);
-      }
-    })
-
-
-    router.get(`${basePath}/:country/generation`, async (req, res, next) => {
-      const country = req.params.country;
-      try {
-        const [periodStart, periodEnd] = Datevalidator.parsePeriod(req.query);
-        const data = await loader.getEntsoeData(country, 'generation', periodStart, periodEnd);
-        res.set('Cache-Control', 'public, max-age=31536000');
-        res.send(data);
-      } catch (e: any) {
-        this.errorHandler(res, e);
-      }
-    })
-
     router.get(`${basePath}/:country/prices`, async (req, res, next) => {
       const country = req.params.country;
       try {
-        const [periodStart, periodEnd] = Datevalidator.parsePeriod(req.query);
+        const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
         const data = await loader.getEntsoeData(country, 'prices', periodStart, periodEnd);
-        res.set('Cache-Control', 'public, max-age=31536000');
-        res.send(data);
+        this.send(req, res, data, cacheDir);
       } catch (e: any) {
         this.errorHandler(res, e);
       }
@@ -186,10 +122,9 @@ export class Entsoe {
     router.get(`${basePath}/:country/hydrofill`, async (req, res, next) => {
       const country = req.params.country;
       try {
-        const [periodStart, periodEnd] = Datevalidator.parsePeriod(req.query);
+        const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
         const data = await loader.getEntsoeData(country, 'hydrofill', periodStart, periodEnd);
-        res.set('Cache-Control', 'public, max-age=31536000');
-        res.send(data);
+        this.send(req, res, data, cacheDir);
       } catch (e: any) {
         this.errorHandler(res, e);
       }
@@ -198,18 +133,13 @@ export class Entsoe {
     router.get(`${basePath}/:country/load`, async (req, res, next) => {
       const country = req.params.country;
       try {
-        const [periodStart, periodEnd] = Datevalidator.parsePeriod(req.query);
+        const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
         const data = await loader.getEntsoeData(country, 'load', periodStart, periodEnd);
-        res.set('Cache-Control', 'public, max-age=31536000');
-        res.send(data);
+        this.send(req, res, data, cacheDir);
       } catch (e: any) {
         this.errorHandler(res, e);
       }
-      next()
     })
-
-
-
 
     router.get(`${basePath}/datalists/countries`, async (req, res, next) => {
       try {
