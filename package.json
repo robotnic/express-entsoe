@@ -1,11 +1,12 @@
 {
   "name": "express-entsoe",
-  "version": "0.2.8",
+  "version": "0.3.0",
   "main": "dist/index.js",
   "scripts": {
     "test": "jasmine --config=spec/jasmine.json",
     "start": "ts-node index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "eslint . --ext .ts"
   },
   "author": "",
   "license": "ISC",
@@ -26,14 +27,17 @@
     "@types/node-fetch": "^3.0.3",
     "@types/supertest": "^2.0.11",
     "@types/xml2js": "^0.4.9",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
+    "eslint": "^7.32.0",
     "jasmine": "^3.9.0",
     "jasmine-console-reporter": "^3.1.0",
     "jasmine-spec-reporter": "^7.0.0",
     "jasmine-ts": "^0.4.0",
+    "node-fetch": "^3.0.0",
     "openapi-types": "^9.3.0",
-    "ts-node": "^10.2.1",
-    "typescript": "^4.4.2",
     "supertest": "^6.1.6",
-    "node-fetch": "^3.0.0"
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.2"
   }
 }

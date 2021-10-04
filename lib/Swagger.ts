@@ -1,4 +1,4 @@
-import { OpenAPIV2, OpenAPIV3 } from "openapi-types";
+import { OpenAPIV3 } from "openapi-types";
 
 
 export class CreateSwagger {
@@ -617,7 +617,7 @@ export class CreateSwagger {
                     "type": "string",
                     "format": "year"
                   },
-                  "chartData": {
+                  "dataset": {
                     "type": "array",
                     "items": {
                       "$ref": "#/components/schemas/Chart"
@@ -636,7 +636,7 @@ export class CreateSwagger {
               "psrType": {
                 "type": "string"
               },
-              "data": {
+              "dataset": {
                 "type": "array",
                 "items": {
                   "$ref": "#/components/schemas/Point"

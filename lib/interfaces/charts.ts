@@ -5,17 +5,18 @@ export interface ChartGroup {
   chartType: string
   chartName: string
   unit?: string
-  chartData: Chart[]
+  dataset: Chart[]
   source: string
-  requestInterval:Interval
-  dataInterval:Interval
+  requestInterval: Interval
+  dataInterval?: Interval
 }
 
 export interface Chart {
   label?: string
   prsType?: string
   color?: string
-  data: Point[]
+  data?: Point[]
+  value?: number
 }
 
 export interface Point {
@@ -26,4 +27,12 @@ export interface Point {
 export interface Interval {
   start?: string
   end?: string
+}
+
+export interface EntsoeError {
+  type: string
+  title: string
+  status: number
+  detail: string
+  instance: string
 }

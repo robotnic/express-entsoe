@@ -1,13 +1,13 @@
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { parseStringPromise } from 'xml2js';
 import { Chart, ChartGroup, Point } from "./interfaces/charts";
 import { Entsoe, EntsoeDocument, EntsoePeriod, EntsoePoint } from "./interfaces/entsoe";
 import { Config, ConfigType } from "./Config";
-import { Duration, Period, ZonedDateTime } from 'js-joda';
-import { addSeconds, differenceInDays, format, getISOWeek, parse } from 'date-fns';
-import { InputError } from './Errors';
-import { getUnpackedSettings } from "http2";
-import { start } from "repl";
+import { Duration, Period } from 'js-joda';
+import { addSeconds, differenceInDays, format, parse } from 'date-fns';
+import { InputError, UpstreamError } from "./Errors";
+import { Country } from "./interfaces/countries";
+import { PsrType } from "./interfaces/psrTypes";
 
 
 export class Loader {
@@ -15,36 +15,37 @@ export class Loader {
   yearRegExp = new RegExp('^\\d{4}$');
   order = ["A05", "B20", "B17", "B1", "B11", "B14", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B12", "B13", "B15", "B16", "B18", "B19"]
 
-
   constructor(private securityToke: string, private entsoeDomain: string) { }
-  async getInstalled(country: string, periodStart: string, periodEnd: string) {
+
+  async getInstalled(country: string, periodStart: string, periodEnd: string): Promise<ChartGroup> {
     const year = periodStart.substring(0, 4);
     const charts = await this.getEntsoeData(country, 'installed', periodStart, periodEnd);
     const chartType = 'installed';
     const chartName = this.config.chartNames[chartType];
+    const countryName = this.config.CountryCodes[country];
 
-    if (charts) {
-      const data = charts.chartData.map(item => {
-        return {
-          prsType: item.prsType,
-          label: item.label,
-          value: item.data[0].y
-        }
-      })
-      const response = {
-        title: `Installed ${this.config.CountryCodes[country]} ${year}`,
-        countryCode: country,
-        chartType: chartType,
-        chartName: chartName,
-        year: year,
-        unit: 'MW',
-        source: `${charts?.source}`,
-        data: data,
+    const data = charts.dataset.map(item => {
+      return {
+        prsType: item.prsType,
+        label: item.label,
+        value: item.data?.[0].y
       }
-      return response
+    })
+    const response = {
+      title: `Installed ${this.config.CountryCodes[country]} ${year}`,
+      countryCode: country,
+      country: countryName,
+      chartType: chartType,
+      chartName: chartName,
+      humanReadableDate: year,
+      unit: 'MW',
+      source: `${charts?.source}`,
+      dataset: data,
+      requestInterval: this.makeRequestedPeriod(periodStart, periodEnd),
     }
+    return response
   }
-  async getCountries() {
+  getCountries(): Country[] {
     return Object.keys(this.config.CountryCodes).map(item => {
       return {
         code: item,
@@ -53,7 +54,7 @@ export class Loader {
     })
   }
 
-  async getPsrTypes() {
+  getPsrTypes(): PsrType[] {
     return Object.keys(this.config.PsrType).map(item => {
       return {
         code: item,
@@ -62,7 +63,7 @@ export class Loader {
     })
   }
 
-  checkCountry(country: string) {
+  checkCountry(country: string): void {
     if (!this.config.CountryCodes[country]) {
       let text = 'Allowed values for country\n\n';
       for (const key of Object.keys(this.config.CountryCodes)) {
@@ -70,11 +71,6 @@ export class Loader {
       }
       throw new InputError(text);
     }
-  }
-
-  getDateTimeString(zondedDateTime: any) {
-    const date = ZonedDateTime.parse(zondedDateTime);
-
   }
 
   periodToDate(period: string): Date {
@@ -93,38 +89,31 @@ export class Loader {
   }
 
 
-  async getEntsoeData(country: string, chartType: string, periodStart: string, periodEnd: string, psrType?: string): Promise<ChartGroup | undefined> {
+  async getEntsoeData(country: string, chartType: string, periodStart: string, periodEnd: string, psrType?: string): Promise<ChartGroup> {
     let path = '';
-    let title = '';
     let unit = '';
     switch (chartType) {
       case 'generation':
-        title = 'power generation';
         unit = 'MW';
         path = `/api?documentType=A75&processType=A16&in_Domain=${country}&outBiddingZone_Domain=${country}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
         break;
       case 'generation_per_plant':
-        title = 'power generation per plant';
         unit = 'MW';
         path = `/api?documentType=A73&processType=A16&in_Domain=${country}&outBiddingZone_Domain=${country}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
         break;
       case 'load':
-        title = 'total load'
         unit = 'MW';
         path = `/api?documentType=A65&processType=A16&outBiddingZone_Domain=${country}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
         break;
       case 'prices':
         path = `/api?documentType=A44&in_Domain=${country}&out_Domain=${country}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
-        title = 'day ahead price'
         unit = '€/MW';
         break;
       case 'hydrofill':
         path = `/api?documentType=A72&processType=A16&in_Domain=${country}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
-        title = 'fill level'
         unit = 'MWh';
         break;
       case 'installed':
-        title = 'installed'
         path = `/api?documentType=A68&processType=A33&in_Domain=${country}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
         unit = 'MW';
         break;
@@ -140,42 +129,35 @@ export class Loader {
     const chartName = this.config.chartNames[chartType];
 
 
-    let response;
-    try {
-//      console.log(url);
-      response = await axios.get(url);
-    } catch (e: any) {
-      //console.trace(e.response.data);
-      return e.response;
+    //      console.log(url);
+    const response = await axios.get(url);
+    //      console.log(response.data);
+    const json = await parseStringPromise(response.data) as Entsoe;
+    let dataset;
+    let start;
+    let end;
+    this.handleError(json, source);
+    if (chartType === 'prices') {
+      [dataset, start, end] = this.convert(json.Publication_MarketDocument);
+    } else {
+      [dataset, start, end] = this.convert(json.GL_MarketDocument);
     }
-    if (response) {
-      //      console.log(response.data);
-      const json = await parseStringPromise(response.data) as Entsoe;
-      let chartData;
-      let start;
-      let end;
-      if (chartType === 'prices') {
-        [chartData, start, end] = this.convert(json.Publication_MarketDocument);
-      } else {
-        [chartData, start, end] = this.convert(json.GL_MarketDocument);
-      }
-      const hrDate = this.makeHrDate(new Date(start || ''), new Date(end || ''));
-      let chartView: ChartGroup = {
-        chartName: chartName,
-        chartType: chartType,
-        country: countryName,
-        source: source,
-        unit: unit,
-        requestInterval: this.makeRequestedPeriod(periodStart, periodEnd),
-        dataInterval: { start: start, end: end },
-        humanReadableDate: hrDate,
-        title: `${country} ${chartName} ${hrDate}`,
+    const hrDate = this.makeHrDate(new Date(start || ''), new Date(end || ''));
+    const chartView: ChartGroup = {
+      chartName: chartName,
+      chartType: chartType,
+      country: countryName,
+      source: source,
+      unit: unit,
+      requestInterval: this.makeRequestedPeriod(periodStart, periodEnd),
+      dataInterval: { start: start, end: end },
+      humanReadableDate: hrDate,
+      title: `${country} ${chartName} ${hrDate}`,
 
 
-        chartData: chartData
-      }
-      return chartView;
+      dataset: dataset
     }
+    return chartView;
   }
 
   convert(orig?: EntsoeDocument): [Chart[], string | undefined, string | undefined] {
@@ -212,10 +194,10 @@ export class Loader {
           data: []
         }
       }
-      chartsByPsrType[psrType].data = chartsByPsrType[psrType].data.concat(data);
+      chartsByPsrType[psrType].data = chartsByPsrType[psrType].data?.concat(data);
     });
-    for (let key of Object.keys(chartsByPsrType)) {
-      const isAllZero = chartsByPsrType[key].data.every(item => Math.abs(item.y) < 10);
+    for (const key of Object.keys(chartsByPsrType)) {
+      const isAllZero = chartsByPsrType[key].data?.every(item => Math.abs(item.y) < 10);
       if (!isAllZero) {
         const theKey = key.split('___')[0];
         if (key.endsWith('___in')) {
@@ -264,9 +246,9 @@ export class Loader {
     const days = differenceInDays(end, start);
     let dateString = format(start, 'yyyy MMM dd')
     if (days > 2) {
-      let year = format(start, 'yyyy')
-      let monthStart = format(start, 'MMM')
-      let monthEnd = format(end, 'MMM')
+      const year = format(start, 'yyyy')
+      const monthStart = format(start, 'MMM')
+      const monthEnd = format(end, 'MMM')
       dateString = `${year} ${monthStart} ${format(start, 'dd')} - ${monthEnd} ${format(end, 'dd')}`
     }
     if (days > 8) {
@@ -279,5 +261,19 @@ export class Loader {
     const title = `${dateString}`;
     return title;
 
-  };
+  }
+
+  handleError(json: Entsoe, url: string): void {
+    if (json.Acknowledgement_MarketDocument) {
+      const error = json.Acknowledgement_MarketDocument;
+      throw new UpstreamError({
+        "type": error.Reason[0].code[0],
+        "title": "No data from ENTSO-e",
+        "status": 404,
+        "detail": error.Reason[0].text[0],
+        "instance": url
+      })
+
+    }
+  }
 }

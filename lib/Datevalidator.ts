@@ -1,13 +1,6 @@
-import axios, { AxiosError } from "axios";
-import { parseStringPromise } from 'xml2js';
-import { Chart, ChartGroup, Point } from "./interfaces/charts";
-import { Entsoe, EntsoeDocument, EntsoePeriod, EntsoePoint } from "./interfaces/entsoe";
-import { Config } from "./Config";
-import { Duration, Period, ZonedDateTime } from 'js-joda';
-import { addDays, addHours, addMonths, addSeconds, addWeeks, addYears, format, getDaysInMonth, setDate, setDay, setISOWeek, setMonth, startOfWeek } from 'date-fns';
+import { addDays, addMonths, addWeeks, addYears, format, getDaysInMonth, setDate, setISOWeek, setMonth, startOfWeek } from 'date-fns';
 import { InputError } from './Errors';
 import QueryString from "qs";
-import e from "express";
 
 
 export class Datevalidator {
@@ -17,12 +10,13 @@ export class Datevalidator {
       this.getPeriod(query.periodEnd)
     ]
   }
-  static getYear(query: QueryString.ParsedQs) {
-    const year = this.checkYear(query.year);
+
+  static getYear(query: QueryString.ParsedQs):[string, string] {
     const periodStart = `${query.year}01010000`;
     const periodEnd = `${query.year}12310000`;
     return [periodStart, periodEnd]
   }
+
   static getStartEnd(query: QueryString.ParsedQs): [string, string] {
     const year = this.checkYear(query.year);
     if (year) {
@@ -67,7 +61,7 @@ export class Datevalidator {
   }
 
 
-  static checkYear(year: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined) {
+  static checkYear(year: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined):string {
     const yearRegExp = new RegExp('^\\d{4}$');
     if (typeof (year) !== 'string') {
       throw new InputError('query parameter year required');
@@ -78,20 +72,20 @@ export class Datevalidator {
     return year;
   }
 
-  static checkMonth(month: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined) {
+  static checkMonth(month: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined): number|undefined {
     if (!month) {
       return;
     }
     if (typeof (month) !== 'string') {
       throw new InputError('month has to be a string');
     }
-    if (parseInt(month as any) < 1 || parseInt(month) > 12) {
+    if (parseInt(month) < 1 || parseInt(month) > 12) {
       throw new InputError('query parameter month must be between 1 and 12. Example: 7');
     }
     return parseInt(month) - 1;
   }
 
-  static checkDay(year: string, month: number, day: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined) {
+  static checkDay(year: string, month: number, day: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined):number|undefined {
     if (!day) {
       return;
     }
@@ -100,12 +94,12 @@ export class Datevalidator {
     }
     const daysInMonth = getDaysInMonth(new Date(parseInt(year), month));
     if (parseInt(day) > daysInMonth || parseInt(day) < 1) {
-      throw new InputError(`${year}-${month} does not have day ${day}`);
+      throw new InputError(`${year}-${month +1} does not have day ${day}`);
     }
     return parseInt(day);
   }
 
-  static checkWeek(week: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined) {
+  static checkWeek(week: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined): number {
     if (typeof (week) !== 'string') {
       throw new InputError('query parameter day is fishy');
     }

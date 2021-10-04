@@ -1,6 +1,7 @@
 export interface Entsoe {
   GL_MarketDocument?: EntsoeDocument
   Publication_MarketDocument?: EntsoeDocument
+  Acknowledgement_MarketDocument?: ErrorDocument
 }
 
 export interface EntsoeDocument {
@@ -32,4 +33,14 @@ export interface EntsoePoint {
   position: string[]
   quantity?: string[]
   'price.amount'?: string[]
+}
+
+export interface ErrorDocument {
+  mRID: string
+  Reason: Reason[]
+}
+
+interface Reason {
+  code: string[]
+  text: string[]
 }
