@@ -18,6 +18,7 @@ export interface Chart {
   color?: string
   data?: Point[]
   value?: number
+  intervalInHours?: number
 }
 
 export interface Point {

@@ -193,7 +193,8 @@ export class Loader {
         chartsByPsrType[psrType] = {
           label: '',
           prsType: '',
-          data: this.makeNullValueData(start, end, durationInSeconds)
+          data: this.makeNullValueData(start, end, durationInSeconds),
+          intervalInHours: durationInSeconds / 3600
         }
       }
       if (durationInSeconds === 0) {
