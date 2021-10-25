@@ -613,9 +613,11 @@ export class CreateSwagger {
               {
                 "type": "object",
                 "properties": {
-                  "year": {
-                    "type": "string",
-                    "format": "year"
+                  "dataInterval": {
+                    "$ref": "#/components/schemas/Interval"
+                  },
+                  "requestInterval": {
+                    "$ref": "#/components/schemas/Interval"
                   },
                   "dataset": {
                     "type": "array",
@@ -672,6 +674,18 @@ export class CreateSwagger {
                   "countryCode": {
                     "type": "string"
                   },
+                  "country": {
+                    "type": "string"
+                  },
+                  "chartType": {
+                    "type": "string"
+                  },
+                  "chartName": {
+                    "type": "string"
+                  },
+                  "humanReadableDate": {
+                    "type": "string"
+                  },
                   "unit": {
                     "type": "string"
                   },
@@ -692,11 +706,7 @@ export class CreateSwagger {
               {
                 "type": "object",
                 "properties": {
-                  "year": {
-                    "type": "string",
-                    "format": "year"
-                  },
-                  "data": {
+                  "dataset": {
                     "type": "array",
                     "items": {
                       "$ref": "#/components/schemas/InstalledGenerationType"
@@ -713,7 +723,7 @@ export class CreateSwagger {
                 "type": "string"
               },
               "value": {
-                "type": "integer"
+                "type": "number"
               },
               "label": {
                 "type": "string"
@@ -739,6 +749,21 @@ export class CreateSwagger {
               },
               "name": {
                 "type": "string"
+              }
+            }
+          },
+
+          "Interval": {
+            "type":"object",
+            "required":[
+              "start","end"
+            ],
+            "properties": {
+              "start":{
+                "type":"string"
+              },
+              "end":{
+                "type":"string"
               }
             }
           },

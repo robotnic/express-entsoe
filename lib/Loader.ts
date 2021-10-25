@@ -13,7 +13,7 @@ import { PsrType } from "./interfaces/psrTypes";
 export class Loader {
   config: ConfigType = Config.get();
   yearRegExp = new RegExp('^\\d{4}$');
-  order = ["A05", "B20", "B17", "B1", "B11", "B14", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B12", "B13", "B15", "B16", "B18", "B19"]
+  order = ["A05", "B20", "B17", "B1", "B11", "B14", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B13", "B15", "B18", "B19", "B10", "B12", "B16"]
 
   constructor(private securityToke: string, private entsoeDomain: string) { }
 
@@ -28,7 +28,8 @@ export class Loader {
       return {
         prsType: item.prsType,
         label: item.label,
-        value: item.data?.[0].y
+        value: item.data?.[0].y,
+        color: this.config.colors[item?.prsType || '']
       }
     })
     const response = {
@@ -147,6 +148,7 @@ export class Loader {
       chartName: chartName,
       chartType: chartType,
       country: countryName,
+      countryCode: country,
       source: source,
       unit: unit,
       requestInterval: this.makeRequestedPeriod(periodStart, periodEnd),
@@ -172,7 +174,7 @@ export class Loader {
       let i = 0;
       const period = timeSeries.Period[0];
       const durationInSeconds = this.getPeriodInSeconds(period);
-      const start = new Date(period.timeInterval[0].start[0]);
+      const start2 = new Date(period.timeInterval[0].start[0]);
       let psrType = timeSeries.MktPSRType?.[0].psrType[0] || 'unknown';
       let sign = 1;
       if (timeSeries['outBiddingZone_Domain.mRID']) {
@@ -180,7 +182,7 @@ export class Loader {
         sign = -1;
       }
       const data: Point[] = period.Point.map(item => {
-        const x = addSeconds(start, durationInSeconds * i++);
+        const x = addSeconds(start2, durationInSeconds * i++);
         const y = this.getYValue(item, sign);
         return {
           x: x.toISOString(),
@@ -191,10 +193,15 @@ export class Loader {
         chartsByPsrType[psrType] = {
           label: '',
           prsType: '',
-          data: []
+          data: this.makeNullValueData(start, end, durationInSeconds)
         }
       }
-      chartsByPsrType[psrType].data = chartsByPsrType[psrType].data?.concat(data);
+      if (durationInSeconds === 0) {
+        // for installed
+        chartsByPsrType[psrType].data = chartsByPsrType[psrType].data?.concat(data);
+      } else {
+        this.fillData(chartsByPsrType[psrType].data, data);
+      }
     });
     for (const key of Object.keys(chartsByPsrType)) {
       const isAllZero = chartsByPsrType[key].data?.every(item => Math.abs(item.y) < 10);
@@ -217,10 +224,37 @@ export class Loader {
     return [sortedCharts, start, end];
   }
 
+  fillData(target: Point[] | undefined, addedPoints: Point[]): void {
+    if (target) {
+      target.forEach(targetPoint => {
+        const sourcePoint = addedPoints.find(point => point.x === targetPoint.x);
+        if (sourcePoint) {
+          targetPoint.y = sourcePoint.y;
+        }
+      })
+    }
+  }
+
+  makeNullValueData(start: string | undefined, end: string | undefined, durationInSeconds: number): Point[] {
+    const pointArray: Point[] = [];
+    if (start && end && durationInSeconds) {
+      const startTime = new Date(start).getTime();
+      const endTime = new Date(end).getTime();
+      for (let t = startTime; t < endTime; t += durationInSeconds * 1000) {
+        pointArray.push({
+          x: (new Date(t).toISOString()),
+          y: 0
+        })
+      }
+    }
+    return pointArray;
+  }
+
   getYValue(item: EntsoePoint, sign: number): number {
     if (item.quantity) {
       return parseFloat(item.quantity[0]) * sign;
     }
+
     if (item["price.amount"]) {
       return parseFloat(item['price.amount'][0]);
     }
@@ -252,7 +286,7 @@ export class Loader {
       dateString = `${year} ${monthStart} ${format(start, 'dd')} - ${monthEnd} ${format(end, 'dd')}`
     }
     if (days > 8) {
-      dateString = format(start, 'yyyy MMM')
+      dateString = format(start, 'yyyy MMMM')
     }
 
     if (days > 40) {

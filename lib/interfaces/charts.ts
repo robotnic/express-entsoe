@@ -1,6 +1,7 @@
 export interface ChartGroup {
   title: string
   country: string
+  countryCode: string
   humanReadableDate: string
   chartType: string
   chartName: string

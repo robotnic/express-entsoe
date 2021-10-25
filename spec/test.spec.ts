@@ -218,6 +218,22 @@ describe('Electricity Generation', () => {
       })
   })
 
+  it('France - missing data', done => {
+    request.default(app)
+      .get('/entsoe/10YFR-RTE------C/generation?year=2020&week=24&timeType=week&country=France')
+      .set('refresh', 'true')
+      .timeout(60000)
+      .expect(200)
+      .then(response => {
+        const body = response.body;
+        body.dataset.forEach((item: any) => {
+          expect(body.dataset[0].data.length - item.data.length).toBe(0);
+        })
+        done();
+      })
+  })
+
+
 
 
 
