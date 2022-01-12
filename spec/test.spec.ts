@@ -7,6 +7,7 @@ import { Country } from '../lib/interfaces/countries';
 
 
 describe('Electricity Generation', () => {
+  const timeout = 120000;
 
   beforeEach(function () {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
@@ -21,7 +22,7 @@ describe('Electricity Generation', () => {
     request.default(app)
       .get('/entsoe/10Y1001A1001A83F/generation?year=2019&week=19')
       .set('refresh', 'true')
-      .timeout(60000)
+      .timeout(timeout)
       .expect(200)
       .then(response => {
         const body = response.body;
@@ -40,7 +41,7 @@ describe('Electricity Generation', () => {
     request.default(app)
       .get('/entsoe/10Y1001A1001A83F/generation?year=2019&month=3&day=11')
       .set('refresh', 'true')
-      .timeout(60000)
+      .timeout(timeout)
       .expect(200)
       .then(response => {
         const body = response.body;
@@ -50,7 +51,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset[0].data.length).toBe(96)
         expect(body.requestInterval.start).toBe('2019-03-11T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-03-12T00:00:00.000Z');
-        expect(body.source).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10Y1001A1001A83F&outBiddingZone_Domain=10Y1001A1001A83F&periodStart=201903110100&periodEnd=201903120100&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.source).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10Y1001A1001A83F&outBiddingZone_Domain=10Y1001A1001A83F&periodStart=201903110000&periodEnd=201903120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })
@@ -59,7 +60,7 @@ describe('Electricity Generation', () => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/generation?year=2019&month=3&day=11')
       .set('refresh', 'true')
-      .timeout(60000)
+      .timeout(timeout)
       .expect(200)
       .then(response => {
         const body = response.body;
@@ -69,7 +70,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset[0].data.length).toBe(96)
         expect(body.requestInterval.start).toBe('2019-03-11T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-03-12T00:00:00.000Z');
-        expect(body.source).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=201903110100&periodEnd=201903120100&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.source).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=201903110000&periodEnd=201903120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })
@@ -78,7 +79,7 @@ describe('Electricity Generation', () => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/generation?year=2019&month=3&day=11&psrType=B16')
       .set('refresh', 'true')
-      .timeout(60000)
+      .timeout(timeout)
       .expect(200)
       .then(response => {
         const body = response.body;
@@ -88,7 +89,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset[0].data.length).toBe(96)
         expect(body.requestInterval.start).toBe('2019-03-11T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-03-12T00:00:00.000Z');
-        expect(body.source).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=201903110100&periodEnd=201903120100&psrType=B16&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.source).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=201903110000&periodEnd=201903120000&psrType=B16&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })
@@ -97,7 +98,7 @@ describe('Electricity Generation', () => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/prices?year=2021&month=3&day=11')
       .set('refresh', 'true')
-      .timeout(60000)
+      .timeout(timeout)
       .expect(200)
       .then(response => {
         const body = response.body;
@@ -107,7 +108,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset[0].data.length).toBe(48)
         expect(body.requestInterval.start).toBe('2021-03-11T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2021-03-12T00:00:00.000Z');
-        expect(body.source).toBe('https://transparency.entsoe.eu/api?documentType=A44&in_Domain=10YAT-APG------L&out_Domain=10YAT-APG------L&periodStart=202103110100&periodEnd=202103120100&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.source).toBe('https://transparency.entsoe.eu/api?documentType=A44&in_Domain=10YAT-APG------L&out_Domain=10YAT-APG------L&periodStart=202103110000&periodEnd=202103120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })
@@ -116,7 +117,7 @@ describe('Electricity Generation', () => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/hydrofill?year=2021&month=3')
       .set('refresh', 'true')
-      .timeout(60000)
+      .timeout(timeout)
       .expect(200)
       .then(response => {
         const body = response.body;
@@ -130,7 +131,7 @@ describe('Electricity Generation', () => {
         const endTime = new Date(body.dataInterval.end).getTime();
         expect(startTime).toBeLessThanOrEqual((new Date('2021-03-01T00:00Z').getTime()));
         expect(endTime).toBeGreaterThanOrEqual((new Date('2021-04-01T00:00Z').getTime()))
-        expect(body.source).toBe('https://transparency.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202103010100&periodEnd=202104010100&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.source).toBe('https://transparency.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202103010000&periodEnd=202104010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
         done();
       })
   })
@@ -139,7 +140,7 @@ describe('Electricity Generation', () => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/installed?year=2020')
       .set('refresh', 'true')
-      .timeout(60000)
+      .timeout(timeout)
       .expect(200)
       .then(response => {
         const body = response.body;
@@ -159,7 +160,7 @@ describe('Electricity Generation', () => {
     request.default(app)
       .get('/entsoe/datalists/countries')
       .set('refresh', 'true')
-      .timeout(60000)
+      .timeout(timeout)
       .expect(200)
       .then(response => {
         const body = response.body as Country[];
@@ -175,15 +176,15 @@ describe('Electricity Generation', () => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/generation?year=3000&month=3&day=11&psrType=B16')
       .set('refresh', 'true')
-      .timeout(60000)
+      .timeout(timeout)
       .expect(404)
       .then(response => {
         const body = response.body;
         expect(body.type).toBe('999')
         expect(body.title).toBe('No data from ENTSO-e')
         expect(body.status).toBe(404)
-        expect(body.detail).toBe('No matching data found for Data item Aggregated Generation per Type [16.1.B&C] (10YAT-APG------L) and interval 3000-03-11T01:00:00.000Z/3000-03-12T01:00:00.000Z.')
-        expect(body.instance).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=300003110100&periodEnd=300003120100&psrType=B16&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.detail).toBe('No matching data found for Data item Aggregated Generation per Type [16.1.B&C] (10YAT-APG------L) and interval 3000-03-11T00:00:00.000Z/3000-03-12T00:00:00.000Z.')
+        expect(body.instance).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=300003110000&periodEnd=300003120000&psrType=B16&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })
@@ -192,7 +193,7 @@ describe('Electricity Generation', () => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/generation?year=2020&month=12&day=32&psrType=B16')
       .set('refresh', 'true')
-      .timeout(60000)
+      .timeout(timeout)
       .expect(400)
       .then(response => {
         const body = response.body;
@@ -207,7 +208,7 @@ describe('Electricity Generation', () => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/generation?year=2020&month=11&day=31&psrType=B16')
       .set('refresh', 'true')
-      .timeout(60000)
+      .timeout(timeout)
       .expect(400)
       .then(response => {
         const body = response.body;
@@ -222,7 +223,7 @@ describe('Electricity Generation', () => {
     request.default(app)
       .get('/entsoe/10YFR-RTE------C/generation?year=2020&week=24&timeType=week&country=France')
       .set('refresh', 'true')
-      .timeout(60000)
+      .timeout(timeout)
       .expect(200)
       .then(response => {
         const body = response.body;

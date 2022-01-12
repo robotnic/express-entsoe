@@ -4,7 +4,8 @@ import { Chart, ChartGroup, Point } from "./interfaces/charts";
 import { Entsoe, EntsoeDocument, EntsoePeriod, EntsoePoint } from "./interfaces/entsoe";
 import { Config, ConfigType } from "./Config";
 import { Duration, Period } from 'js-joda';
-import { addSeconds, differenceInDays, format, parse } from 'date-fns';
+import { addSeconds, differenceInDays, parse} from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import { InputError, UpstreamError } from "./Errors";
 import { Country } from "./interfaces/countries";
 import { PsrType } from "./interfaces/psrTypes";
@@ -154,7 +155,7 @@ export class Loader {
       requestInterval: this.makeRequestedPeriod(periodStart, periodEnd),
       dataInterval: { start: start, end: end },
       humanReadableDate: hrDate,
-      title: `${country} ${chartName} ${hrDate}`,
+      title: `${countryName} ${chartName} ${hrDate}`,
 
 
       dataset: dataset
@@ -279,19 +280,19 @@ export class Loader {
 
   makeHrDate(start: Date, end: Date): string {
     const days = differenceInDays(end, start);
-    let dateString = format(start, 'yyyy MMM dd')
+    let dateString = formatInTimeZone(start, 'utc', 'yyyy MMM dd')
     if (days > 2) {
-      const year = format(start, 'yyyy')
-      const monthStart = format(start, 'MMM')
-      const monthEnd = format(end, 'MMM')
-      dateString = `${year} ${monthStart} ${format(start, 'dd')} - ${monthEnd} ${format(end, 'dd')}`
+      const year = formatInTimeZone(start, 'utc', 'yyyy')
+      const monthStart = formatInTimeZone(start, 'utc', 'MMM')
+      const monthEnd = formatInTimeZone(end, 'utc', 'MMM')
+      dateString = `${year} ${monthStart} ${formatInTimeZone(start, 'utc', 'dd')} - ${monthEnd} ${formatInTimeZone(end, 'utc', 'dd')}`
     }
     if (days > 8) {
-      dateString = format(start, 'yyyy MMMM')
+      dateString = formatInTimeZone(start, 'utc', 'yyyy MMMM')
     }
 
     if (days > 40) {
-      dateString = format(start, 'yyyy')
+      dateString = formatInTimeZone(start, 'utc', 'yyyy')
     }
     const title = `${dateString}`;
     return title;

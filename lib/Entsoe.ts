@@ -19,6 +19,7 @@ interface Config {
 
 export class Entsoe {
   static init(config: Config): express.Router {
+
     let entsoeDomain = 'https://transparency.entsoe.eu';
     let cacheDir = './cacheDir/';
     let basePath = '/entsoe';
@@ -195,7 +196,7 @@ export class Entsoe {
     return router;
   }
 
-  private static cacheAndSend(req: express.Request, res: express.Response, data: ChartGroup, cacheDir: string):void {
+  private static cacheAndSend(req: express.Request, res: express.Response, data: ChartGroup, cacheDir: string): void {
     const buf = Buffer.from(JSON.stringify(data), 'utf-8');
     gzip(buf, (_, result) => {
       res.set('etag', (new Date()).getTime() + '');  //assuming the file will be writen in same second
@@ -217,7 +218,7 @@ export class Entsoe {
   }
 
 
-  private static errorHandler(res: express.Response, e: Error):express.Response {
+  private static errorHandler(res: express.Response, e: Error): express.Response {
     if (e instanceof InputError) {
       return res.status(e.status).send({
         title: 'Invalid input',
