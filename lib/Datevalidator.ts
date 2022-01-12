@@ -1,4 +1,6 @@
-import { addDays, addMonths, addWeeks, addYears, format, getDaysInMonth, setDate, setISOWeek, setMonth, startOfWeek } from 'date-fns';
+import {formatISO, addDays, addMonths, addWeeks, addYears, format, getDaysInMonth, setDate, setISOWeek, setMonth, startOfWeek, setWeek } from 'date-fns';
+import { formatInTimeZone, utcToZonedTime } from 'date-fns-tz'
+
 import { InputError } from './Errors';
 import QueryString from "qs";
 
@@ -20,7 +22,7 @@ export class Datevalidator {
   static getStartEnd(query: QueryString.ParsedQs): [string, string] {
     const year = this.checkYear(query.year);
     if (year) {
-      let startDate = new Date(year);
+      let startDate = new Date(`${year}-01-01T00:00:00Z`);
       let endDate = addYears(startDate, 1);
       const month = this.checkMonth(query.month);
       if (typeof (month) === 'number') {
@@ -38,12 +40,15 @@ export class Datevalidator {
         if (query.week) {
           const week = this.checkWeek(query.week);
           startDate = addMonths(startDate, 1);
-          startDate = startOfWeek(setISOWeek(startDate, week));
+          startDate = startOfWeek(setWeek(startDate, week));
+          console.log('startDate', startDate)
+          startDate = addDays(startDate,1);
           endDate = addWeeks(startDate, 1);
+          console.log('endDate', endDate)
         }
       }
-      const periodStart = format(startDate, 'yyyyMMddHH00')
-      const periodEnd = format(endDate, 'yyyyMMddHH00')
+      const periodStart = formatInTimeZone(startDate, 'UTC', 'yyyyMMdd0000')
+      const periodEnd = formatInTimeZone(endDate, 'UTC', 'yyyyMMdd0000')
       return [periodStart, periodEnd]
     } else {
       return this.parsePeriod(query);
