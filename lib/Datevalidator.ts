@@ -41,10 +41,8 @@ export class Datevalidator {
           const week = this.checkWeek(query.week);
           startDate = addMonths(startDate, 1);
           startDate = startOfWeek(setWeek(startDate, week));
-          console.log('startDate', startDate)
           startDate = addDays(startDate,1);
           endDate = addWeeks(startDate, 1);
-          console.log('endDate', endDate)
         }
       }
       const periodStart = formatInTimeZone(startDate, 'UTC', 'yyyyMMdd0000')
