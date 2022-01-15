@@ -7,7 +7,7 @@ export interface ChartGroup {
   chartName: string
   unit?: string
   dataset: Chart[]
-  source: string
+  sources?: Source[]
   requestInterval: Interval
   dataInterval?: Interval
 }
@@ -19,6 +19,12 @@ export interface Chart {
   data?: Point[]
   value?: number
   intervalInHours?: number
+}
+
+export interface Source {
+  title?: string
+  description?: string
+  url?: string
 }
 
 export interface Point {

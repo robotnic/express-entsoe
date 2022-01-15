@@ -1,6 +1,6 @@
 import axios from "axios";
 import { parseStringPromise } from 'xml2js';
-import { Chart, ChartGroup, Point } from "./interfaces/charts";
+import { Chart, ChartGroup, Point, Source } from "./interfaces/charts";
 import { Entsoe, EntsoeDocument, EntsoePeriod, EntsoePoint } from "./interfaces/entsoe";
 import { Config, ConfigType } from "./Config";
 import { Duration, Period } from 'js-joda';
@@ -41,7 +41,7 @@ export class Loader {
       chartName: chartName,
       humanReadableDate: year,
       unit: 'MW',
-      source: `${charts?.source}`,
+      sources: charts?.sources,
       dataset: data,
       requestInterval: this.makeRequestedPeriod(periodStart, periodEnd),
     }
@@ -126,7 +126,10 @@ export class Loader {
       path = `${path}&psrType=${psrType}`
     }
     const url = `${this.entsoeDomain}${path}&securityToken=${this.securityToke}`;
-    const source = `${this.entsoeDomain}${path}&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`;
+    const sources = [{
+      title: 'Entsoe data',
+      url:`${this.entsoeDomain}${path}&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`
+    }];
     const countryName = this.config.CountryCodes[country];
     const chartName = this.config.chartNames[chartType];
 
@@ -138,7 +141,7 @@ export class Loader {
     let dataset;
     let start;
     let end;
-    this.handleError(json, source);
+    this.handleError(json, sources);
     if (chartType === 'prices') {
       [dataset, start, end] = this.convert(json.Publication_MarketDocument);
     } else {
@@ -150,7 +153,7 @@ export class Loader {
       chartType: chartType,
       country: countryName,
       countryCode: country,
-      source: source,
+      sources: sources,
       unit: unit,
       requestInterval: this.makeRequestedPeriod(periodStart, periodEnd),
       dataInterval: { start: start, end: end },
@@ -299,7 +302,7 @@ export class Loader {
 
   }
 
-  handleError(json: Entsoe, url: string): void {
+  handleError(json: Entsoe, sources: Source[]): void {
     if (json.Acknowledgement_MarketDocument) {
       const error = json.Acknowledgement_MarketDocument;
       throw new UpstreamError({
@@ -307,7 +310,7 @@ export class Loader {
         "title": "No data from ENTSO-e",
         "status": 404,
         "detail": error.Reason[0].text[0],
-        "instance": url
+        "instance": sources[0].url || ''
       })
 
     }

@@ -415,7 +415,7 @@ export class CreateSwagger {
             }
           }
         },
-       [`${basePath}/{country}/load`]: {
+        [`${basePath}/{country}/load`]: {
           "get": {
             "description": "",
             "operationId": "getCachedLoad",
@@ -505,7 +505,7 @@ export class CreateSwagger {
             }
           }
         },
- 
+
         [`${basePath}/{country}/prices`]: {
           "get": {
             "description": "",
@@ -597,7 +597,7 @@ export class CreateSwagger {
           }
         },
 
-     },
+      },
 
 
 
@@ -690,14 +690,29 @@ export class CreateSwagger {
                     "type": "string"
                   },
                   "source": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Source"
+                    }
                   },
                 }
               }
             ]
           },
-
-
+          "Source": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+            }
+          },
           "InstalledGeneration": {
             "allOf": [
               {
@@ -754,16 +769,16 @@ export class CreateSwagger {
           },
 
           "Interval": {
-            "type":"object",
-            "required":[
-              "start","end"
+            "type": "object",
+            "required": [
+              "start", "end"
             ],
             "properties": {
-              "start":{
-                "type":"string"
+              "start": {
+                "type": "string"
               },
-              "end":{
-                "type":"string"
+              "end": {
+                "type": "string"
               }
             }
           },
