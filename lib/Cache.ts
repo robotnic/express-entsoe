@@ -7,14 +7,14 @@ import { EntsoeConfig } from './interfaces/entsoeCache';
 export class EntsoeCache {
 
   static async write(data: Buffer, filename: string, config: EntsoeConfig): Promise<string|void> {
-    if (config.awsAccessKeyId) {
+    if (config.awsBucket) {
       return this.writeAWS(data, filename, config);
     } else {
       this.writeFile(data, filename, config);
     }
   }
   static async read(fileName: string, config: EntsoeConfig, ETag?: string): Promise<ReadStream | undefined> {
-    if (config.awsAccessKeyId) {
+    if (config.awsBucket) {
       return this.readAWS(fileName, config, ETag);
     } else {
       return this.readFile(fileName, config, ETag);

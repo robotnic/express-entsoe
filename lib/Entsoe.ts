@@ -27,10 +27,12 @@ export class Entsoe {
       entsoeDomain = entsoeConfig.entsoeDomain;
     }
     const awsConfig: ConfigurationOptions = {
-      secretAccessKey: "goXr+B1DkvxTBV3dnT4IK79X86cDb+pwsG/qouOv",
-      accessKeyId: "AKIATBMBUZWDJ5TPAKA3",
+      secretAccessKey: entsoeConfig.awsSecretAccessKey,
+      accessKeyId: entsoeConfig.awsAccessKeyId,
       region: 'eu-central-1'
     }
+    delete entsoeConfig.awsAccessKeyId;
+    delete entsoeConfig.awsSecretAccessKey;
     config.update(awsConfig);
 
     const loader = new Loader(entsoeConfig.securityToken, entsoeDomain);

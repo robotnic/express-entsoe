@@ -1,6 +1,6 @@
 {
   "name": "express-entsoe",
-  "version": "0.5.2",
+  "version": "0.5.5",
   "main": "dist/index.js",
   "scripts": {
     "test": "env-cmd jasmine --config=spec/jasmine.json",
