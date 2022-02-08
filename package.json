@@ -1,9 +1,9 @@
 {
   "name": "express-entsoe",
-  "version": "0.4.12",
+  "version": "0.5.2",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jasmine --config=spec/jasmine.json",
+    "test": "env-cmd jasmine --config=spec/jasmine.json",
     "start": "ts-node index.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts"
@@ -12,9 +12,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "aws-sdk": "^2.1066.0",
     "axios": "^0.21.1",
     "date-fns": "^2.28.0",
     "date-fns-tz": "^1.2.2",
+    "env-cmd": "10.1.0",
     "express": "^4.17.1",
     "js-joda": "^1.11.0",
     "xml2js": "^0.4.23"

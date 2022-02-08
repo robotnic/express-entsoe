@@ -3,67 +3,62 @@ import { InputError, UpstreamError } from './Errors';
 import { Loader } from './Loader';
 import { CreateSwagger } from './Swagger';
 import { gzip } from 'zlib';
-import { createReadStream, stat, writeFile } from 'fs';
-import path from 'path';
 import { Datevalidator } from './Datevalidator';
 import { ChartGroup } from './interfaces/charts';
+import { EntsoeCache } from './Cache';
+import { EntsoeConfig } from './interfaces/entsoeCache';
+import { ConfigurationOptions, config } from 'aws-sdk';
 
-
-interface Config {
-  securityToken: string
-  basePath?: string
-  cacheDir?: string
-  entsoeDomain?: string
-  maxAge?: number
-}
 
 export class Entsoe {
-  static init(config: Config): express.Router {
+  static init(entsoeConfig: EntsoeConfig): express.Router {
 
     let entsoeDomain = 'https://transparency.entsoe.eu';
-    let cacheDir = './cacheDir/';
     let basePath = '/entsoe';
     let maxAge = 3600;
 
-    if (config.basePath) {
-      basePath = config.basePath;
+    if (entsoeConfig.basePath) {
+      basePath = entsoeConfig.basePath;
     }
-    if (config.cacheDir) {
-      cacheDir = config.cacheDir;
+    if (entsoeConfig.maxAge) {
+      maxAge = entsoeConfig.maxAge;
     }
-    if (config.maxAge) {
-      maxAge = config.maxAge;
+    if (entsoeConfig.entsoeDomain) {
+      entsoeDomain = entsoeConfig.entsoeDomain;
     }
-    if (config.entsoeDomain) {
-      entsoeDomain = config.entsoeDomain;
+    const awsConfig: ConfigurationOptions = {
+      secretAccessKey: "goXr+B1DkvxTBV3dnT4IK79X86cDb+pwsG/qouOv",
+      accessKeyId: "AKIATBMBUZWDJ5TPAKA3",
+      region: 'eu-central-1'
     }
+    config.update(awsConfig);
 
-
-    const loader = new Loader(config.securityToken, entsoeDomain);
+    const loader = new Loader(entsoeConfig.securityToken, entsoeDomain);
     const router = express.Router();
+
+
 
     router.use(async (req, res, next) => {
       const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      const fileDirName = path.join(cacheDir, fileName);
-      stat(fileDirName, (err, stats) => {
-        if (err || req.get('refresh') === 'true') {
-          next();
+      try {
+
+        //const fileDirName = path.join(cacheDir, fileName);
+        const ETag = req.get('If-None-Match');
+        // const data = await this.getCachedFile(fileDirName, ETag);
+        const stream = await EntsoeCache.read(fileName, entsoeConfig, ETag);
+        if (!stream) {
+          res.sendStatus(304);
         } else {
-          const fileTime = (new Date(stats.mtime)).getTime() + '';
-          if (fileTime === req.get('If-None-Match')) {
-            res.sendStatus(304);
-          } else {
-            res.set('Cache-Control', `public, max-age=${maxAge}`);
-            res.set('content-type', 'application/json');
-            res.set('content-encoding', 'gzip');
-            res.set('etag', fileTime);
-            const stream = createReadStream(fileDirName).on('error', () => {
-              next()
-            })
-            stream.pipe(res);
-          }
+          res.set('Cache-Control', `public, max-age=${maxAge}`);
+          res.set('content-type', 'application/json');
+          res.set('content-encoding', 'gzip');
+          res.set('etag', ETag);
+          stream.pipe(res);
+
         }
-      })
+      } catch (e) {
+        next();
+      }
     });
 
 
@@ -73,7 +68,7 @@ export class Entsoe {
       try {
         const [periodStart, periodEnd] = Datevalidator.getYear(req.query);
         const data = await loader.getInstalled(country, periodStart, periodEnd);
-        this.cacheAndSend(req, res, data, cacheDir);
+        this.cacheAndSend(req, res, data, entsoeConfig);
       } catch (e: unknown) {
         if (e instanceof Error) {
           this.errorHandler(res, e);
@@ -90,7 +85,7 @@ export class Entsoe {
       try {
         const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
         const data = await loader.getEntsoeData(country, 'generation', periodStart, periodEnd, psrType);
-        this.cacheAndSend(req, res, data, cacheDir);
+        this.cacheAndSend(req, res, data, entsoeConfig);
       } catch (e: unknown) {
         if (e instanceof Error) {
           this.errorHandler(res, e);
@@ -107,7 +102,7 @@ export class Entsoe {
       try {
         const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
         const data = await loader.getEntsoeData(country, 'generation_per_plant', periodStart, periodEnd, psrType);
-        this.cacheAndSend(req, res, data, cacheDir);
+        this.cacheAndSend(req, res, data, entsoeConfig);
       } catch (e: unknown) {
         if (e instanceof Error) {
           this.errorHandler(res, e);
@@ -121,7 +116,7 @@ export class Entsoe {
       try {
         const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
         const data = await loader.getEntsoeData(country, 'prices', periodStart, periodEnd);
-        this.cacheAndSend(req, res, data, cacheDir);
+        this.cacheAndSend(req, res, data, entsoeConfig);
       } catch (e: unknown) {
         if (e instanceof Error) {
           this.errorHandler(res, e);
@@ -134,7 +129,7 @@ export class Entsoe {
       try {
         const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
         const data = await loader.getEntsoeData(country, 'hydrofill', periodStart, periodEnd);
-        this.cacheAndSend(req, res, data, cacheDir);
+        this.cacheAndSend(req, res, data, entsoeConfig);
       } catch (e: unknown) {
         if (e instanceof Error) {
           this.errorHandler(res, e);
@@ -147,7 +142,7 @@ export class Entsoe {
       try {
         const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
         const data = await loader.getEntsoeData(country, 'load', periodStart, periodEnd);
-        this.cacheAndSend(req, res, data, cacheDir);
+        this.cacheAndSend(req, res, data, entsoeConfig);
       } catch (e: unknown) {
         if (e instanceof Error) {
           this.errorHandler(res, e);
@@ -181,7 +176,7 @@ export class Entsoe {
 
 
 
-    router.get(`${basePath}`, async (req, res) => {
+    router.get(`${basePath} `, async (req, res) => {
       try {
         const data = await CreateSwagger.load(basePath);
         res.set('Cache-Control', 'public, max-age=31536000');
@@ -196,17 +191,23 @@ export class Entsoe {
     return router;
   }
 
-  private static cacheAndSend(req: express.Request, res: express.Response, data: ChartGroup, cacheDir: string): void {
+  private static cacheAndSend(req: express.Request, res: express.Response, data: ChartGroup, config: EntsoeConfig): void {
     const buf = Buffer.from(JSON.stringify(data), 'utf-8');
-    gzip(buf, (_, result) => {
+    gzip(buf, async (_, result) => {
       res.set('etag', (new Date()).getTime() + '');  //assuming the file will be writen in same second
       if (req.get('accept-encoding')?.indexOf('gzip') !== -1) {
         res.set('content-type', 'application/json');
         res.set('content-encoding', 'gzip');
+        const ETag = await EntsoeCache.write(result, req.url, config);
+        if (ETag) {
+          res.set('ETag', ETag);  //aws ETag
+        }
         res.send(result);
       } else {
         res.send(data);
       }
+      EntsoeCache.write(result, req.url, config);
+      /*
       const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
       const fileDirName = path.join(cacheDir, fileName);
       writeFile(fileDirName, result, (e) => {
@@ -214,6 +215,7 @@ export class Entsoe {
           console.log(e);
         }
       })
+      */
     });
   }
 
@@ -232,4 +234,32 @@ export class Entsoe {
     console.trace(e.message);
     return res.status(500).send('unexpected internal error');
   }
+
+  /*
+  static async writeCachedFile(data: string, cacheDir: string, url: string): Promise<void>{
+    const fileName = url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    const fileDirName = path.join(cacheDir, fileName);
+    writeFile(fileDirName, data, (e) => {
+      if (e) {
+        console.log(e);
+      }
+    })
+  }
+
+  static async getCachedFile(fileDirName: string, ETag?: string): Promise<ReadStream | undefined> {
+    const stats = await promises.stat(fileDirName);
+    const fileTime = (new Date(stats.mtime)).getTime() + '';
+
+    if (fileTime === ETag) {
+      return;
+    } else {
+      const stream = createReadStream(fileDirName).on('error', e => {
+        throw e;
+      });
+      return stream;
+
+    }
+  }
+  */
 }
+
