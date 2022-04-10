@@ -79,6 +79,12 @@ describe('Electricity Generation', () => {
         expect(body.requestInterval.start).toBe('2019-03-11T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-03-12T00:00:00.000Z');
         expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=201903110000&periodEnd=201903120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+
+        body.dataset.forEach((dataset: any) => {
+          expect(typeof(dataset.label)).toBe('string')
+          expect(typeof(dataset.color)).toBe('string')
+        })
+
         done();
       })
   })
@@ -182,9 +188,42 @@ describe('Electricity Generation', () => {
         expect(body.requestInterval.start).toBe('2020-01-01T00:00:00.000Z');
         expect(body.requestInterval.end).toBe('2020-12-31T00:00:00.000Z');
         expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YAT-APG------L&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+
+        body.dataset.forEach((dataset: any) => {
+          expect(typeof(dataset.label)).toBe('string')
+          expect(typeof(dataset.color)).toBe('string')
+        })
+
+
         done();
       })
   })
+
+  it('Installed Generation France 2020', done => {
+    request.default(app)
+      .get('/entsoe/10YFR-RTE------C/installed?year=2020')
+      .set('refresh', 'true')
+      .timeout(timeout)
+      .expect(200)
+      .then(response => {
+        const body = response.body;
+        expect(body.chartName).toBe('Installed Power')
+        expect(body.unit).toBe('MW')
+        expect(body.dataset.length).toBe(13)
+        expect(body.requestInterval.start).toBe('2020-01-01T00:00:00.000Z');
+        expect(body.requestInterval.end).toBe('2020-12-31T00:00:00.000Z');
+        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YFR-RTE------C&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+
+        body.dataset.forEach((dataset: any) => {
+          expect(typeof(dataset.label)).toBe('string')
+          expect(typeof(dataset.color)).toBe('string')
+        })
+
+
+        done();
+      })
+  })
+
 
 
 
