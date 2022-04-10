@@ -14,7 +14,7 @@ export interface ChartGroup {
 
 export interface Chart {
   label?: string
-  prsType?: string
+  psrType?: string
   color?: string
   data?: Point[]
   value?: number

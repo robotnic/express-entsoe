@@ -83,6 +83,7 @@ describe('Electricity Generation', () => {
         body.dataset.forEach((dataset: any) => {
           expect(typeof(dataset.label)).toBe('string')
           expect(typeof(dataset.color)).toBe('string')
+          expect(typeof(dataset.psrType)).toBe('string')
         })
 
         done();
@@ -192,6 +193,7 @@ describe('Electricity Generation', () => {
         body.dataset.forEach((dataset: any) => {
           expect(typeof(dataset.label)).toBe('string')
           expect(typeof(dataset.color)).toBe('string')
+          expect(typeof(dataset.psrType)).toBe('string')
         })
 
 
@@ -215,8 +217,10 @@ describe('Electricity Generation', () => {
         expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YFR-RTE------C&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
 
         body.dataset.forEach((dataset: any) => {
+          console.log(dataset.label, dataset.color,dataset.psrType)
           expect(typeof(dataset.label)).toBe('string')
           expect(typeof(dataset.color)).toBe('string')
+          expect(typeof(dataset.psrType)).toBe('string')
         })
 
 

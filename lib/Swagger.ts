@@ -734,7 +734,7 @@ export class CreateSwagger {
           "InstalledGenerationType": {
             "type": "object",
             "properties": {
-              "prsType": {
+              "psrType": {
                 "type": "string"
               },
               "value": {

@@ -26,11 +26,12 @@ export class Loader {
     const countryName = this.config.CountryCodes[country];
 
     const data = charts.dataset.map(item => {
+      console.log(item);
       return {
-        prsType: item.prsType,
+        psrType: item.psrType,
         label: item.label,
         value: item.data?.[0].y,
-        color: this.config.colors[item?.prsType || '']
+        color: this.config.colors[item?.psrType || '']
       }
     })
     const response = {
@@ -196,7 +197,7 @@ export class Loader {
       if (!chartsByPsrType[psrType]) {
         chartsByPsrType[psrType] = {
           label: '',
-          prsType: '',
+          psrType: '',
           data: this.makeNullValueData(start, end, durationInSeconds),
           intervalInHours: durationInSeconds / 3600
         }
@@ -218,13 +219,13 @@ export class Loader {
           chartsByPsrType[key].label = this.config.PsrType[theKey];
         }
         chartsByPsrType[key].color = this.config.colors[key];
-        chartsByPsrType[key].prsType = theKey;
+        chartsByPsrType[key].psrType = theKey;
         charts.push(chartsByPsrType[key]);
 
       }
     }
     const sortedCharts = charts.sort((a, b) => {
-      return this.order.indexOf(a?.prsType || '') - this.order.indexOf(b?.prsType || '');
+      return this.order.indexOf(a?.psrType || '') - this.order.indexOf(b?.psrType || '');
     })
     return [sortedCharts, start, end];
   }
