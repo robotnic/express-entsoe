@@ -15,16 +15,16 @@ describe('Electricity Generation', () => {
 
   const app = express();
   if (process.env.securityToken) {
-  app.use(Entsoe.init({
-    securityToken: process.env.securityToken,
-    awsBucket: process.env.awsBucket,
-    awsSecretAccessKey: process.env.awsSecretAccessKey,
-    awsAccessKeyId: process.env.awsAccessKeyId,
-    awsRegion: process.env.awsRegion
-  }));
-} else {
-  console.log('process.env.securityToken missing')
-}
+    app.use(Entsoe.init({
+      securityToken: process.env.securityToken,
+      awsBucket: process.env.awsBucket,
+      awsSecretAccessKey: process.env.awsSecretAccessKey,
+      awsAccessKeyId: process.env.awsAccessKeyId,
+      awsRegion: process.env.awsRegion
+    }));
+  } else {
+    console.log('process.env.securityToken missing')
+  }
 
   it('Electricity Generation Week Germany', done => {
     request.default(app)

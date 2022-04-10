@@ -3,4 +3,5 @@ cacheDir
 dist
 todo.txt
 .env
+.env-aws
 .env-test
