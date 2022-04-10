@@ -1,5 +1,5 @@
-import {formatISO, addDays, addMonths, addWeeks, addYears, format, getDaysInMonth, setDate, setISOWeek, setMonth, startOfWeek, setWeek } from 'date-fns';
-import { formatInTimeZone, utcToZonedTime } from 'date-fns-tz'
+import { addDays, addMonths, addWeeks, addYears, getDaysInMonth, setDate, setMonth, startOfWeek, setWeek, addHours } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz'
 
 import { InputError } from './Errors';
 import QueryString from "qs";
@@ -13,7 +13,7 @@ export class Datevalidator {
     ]
   }
 
-  static getYear(query: QueryString.ParsedQs):[string, string] {
+  static getYear(query: QueryString.ParsedQs): [string, string] {
     const periodStart = `${query.year}01010000`;
     const periodEnd = `${query.year}12310000`;
     return [periodStart, periodEnd]
@@ -31,6 +31,7 @@ export class Datevalidator {
         }
         startDate = setMonth(startDate, month)
         endDate = addMonths(startDate, 1);
+        endDate = addHours(endDate, 1);  //day light saving corrections
         const day = this.checkDay(year, month, query.day);
         if (day) {
           startDate = setDate(startDate, day)
@@ -41,7 +42,7 @@ export class Datevalidator {
           const week = this.checkWeek(query.week);
           startDate = addMonths(startDate, 1);
           startDate = startOfWeek(setWeek(startDate, week));
-          startDate = addDays(startDate,1);
+          startDate = addDays(startDate, 1);
           endDate = addWeeks(startDate, 1);
         }
       }
@@ -64,7 +65,7 @@ export class Datevalidator {
   }
 
 
-  static checkYear(year: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined):string {
+  static checkYear(year: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined): string {
     const yearRegExp = new RegExp('^\\d{4}$');
     if (typeof (year) !== 'string') {
       throw new InputError('query parameter year required');
@@ -75,7 +76,7 @@ export class Datevalidator {
     return year;
   }
 
-  static checkMonth(month: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined): number|undefined {
+  static checkMonth(month: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined): number | undefined {
     if (!month) {
       return;
     }
@@ -88,7 +89,7 @@ export class Datevalidator {
     return parseInt(month) - 1;
   }
 
-  static checkDay(year: string, month: number, day: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined):number|undefined {
+  static checkDay(year: string, month: number, day: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined): number | undefined {
     if (!day) {
       return;
     }
@@ -97,7 +98,7 @@ export class Datevalidator {
     }
     const daysInMonth = getDaysInMonth(new Date(parseInt(year), month));
     if (parseInt(day) > daysInMonth || parseInt(day) < 1) {
-      throw new InputError(`${year}-${month +1} does not have day ${day}`);
+      throw new InputError(`${year}-${month + 1} does not have day ${day}`);
     }
     return parseInt(day);
   }

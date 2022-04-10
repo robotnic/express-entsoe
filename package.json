@@ -3,7 +3,7 @@
   "version": "0.5.5",
   "main": "dist/index.js",
   "scripts": {
-    "test": "env-cmd jasmine --config=spec/jasmine.json",
+    "test": "env-cmd -f .env-test jasmine --config=spec/jasmine.json",
     "start": "ts-node index.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts"
@@ -13,7 +13,7 @@
   "description": "",
   "dependencies": {
     "aws-sdk": "^2.1066.0",
-    "axios": "^0.21.1",
+    "axios": "^0.21.4",
     "date-fns": "^2.28.0",
     "date-fns-tz": "^1.2.2",
     "env-cmd": "10.1.0",
@@ -37,7 +37,7 @@
     "jasmine-console-reporter": "^3.1.0",
     "jasmine-spec-reporter": "^7.0.0",
     "jasmine-ts": "^0.4.0",
-    "node-fetch": "^3.0.0",
+    "node-fetch": "^3.2.3",
     "openapi-types": "^9.3.0",
     "supertest": "^6.1.6",
     "ts-node": "^10.2.1",

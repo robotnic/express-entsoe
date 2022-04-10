@@ -3,3 +3,4 @@ cacheDir
 dist
 todo.txt
 .env
+.env-test

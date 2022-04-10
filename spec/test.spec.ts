@@ -121,7 +121,31 @@ describe('Electricity Generation', () => {
       })
   })
 
-  it('Hydro fill Month Austria', done => {
+  it('Hydro fill Month Austria Feb', done => {
+    request.default(app)
+      .get('/entsoe/10YAT-APG------L/hydrofill?year=2021&month=2')
+      .set('refresh', 'true')
+      .timeout(timeout)
+      .expect(200)
+      .then(response => {
+        const body = response.body;
+        expect(body.chartName).toBe('Hydro Power Fill Level')
+        expect(body.unit).toBe('MWh')
+        expect(body.dataset.length).toBe(1)
+        expect(body.dataset[0].data.length).toBe(4)
+        expect(body.requestInterval.start).toBe('2021-02-01T00:00:00.000Z');
+        expect(body.requestInterval.end).toBe('2021-03-01T00:00:00.000Z');
+        const startTime = new Date(body.dataInterval.start).getTime();
+        const endTime = new Date(body.dataInterval.end).getTime();
+        expect(startTime).toBeLessThanOrEqual((new Date('2021-02-01T00:00Z').getTime()));
+        expect(endTime).toBeGreaterThanOrEqual((new Date('2021-03-01T00:00Z')).getTime() - 3600000)
+        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202102010000&periodEnd=202103010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        done();
+      })
+  })
+
+
+  it('Hydro fill Month Austria March', done => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/hydrofill?year=2021&month=3')
       .set('refresh', 'true')
