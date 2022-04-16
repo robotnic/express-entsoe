@@ -20,7 +20,8 @@ describe('Electricity Generation', () => {
       awsBucket: process.env.awsBucket,
       awsSecretAccessKey: process.env.awsSecretAccessKey,
       awsAccessKeyId: process.env.awsAccessKeyId,
-      awsRegion: process.env.awsRegion
+      awsRegion: process.env.awsRegion,
+      cacheDir: process.env.cacheDir
     }));
   } else {
     console.log('process.env.securityToken missing')

@@ -1,10 +1,11 @@
 {
   "name": "express-entsoe",
-  "version": "0.5.20",
+  "version": "0.5.21",
   "main": "dist/index.js",
   "scripts": {
     "test": "env-cmd -f .env-test jasmine --config=spec/jasmine.json",
     "test:aws": "env-cmd -f .env-aws jasmine --config=spec/jasmine.json",
+    "test:cache": "env-cmd -f .env-cache jasmine --config=spec/jasmine.json",
     "start": "ts-node index.ts",
     "build": "rm -r dist && tsc --project tsconfig-build.json",
     "lint": "eslint . --ext .ts"

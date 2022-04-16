@@ -42,36 +42,38 @@ export class Entsoe {
 
 
     router.use(async (req, res, next) => {
+      let headersSent = false;
       const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
       try {
 
         //const fileDirName = path.join(cacheDir, fileName);
         const ETag = req.get('If-None-Match');
         // const data = await this.getCachedFile(fileDirName, ETag);
-        const stream = EntsoeCache.readAWS(fileName, entsoeConfig, ETag);
+        const stream = await EntsoeCache.read(fileName, entsoeConfig, ETag);
         if (!stream) {
           res.sendStatus(304);
         } else {
-          res.set('Cache-Control', `public, max-age=${maxAge}`);
-          res.set('content-type', 'application/json');
-          res.set('content-encoding', 'gzip');
-          res.set('etag', ETag);
-          /*
-          const readable = stream.on('error', (e:Error) => {
-            console.log('====+====', e);
-            stream.abort();
-            throw e;
-          });
-          */
-
-          stream.createReadStream().pipe(res)
-          .on('error', (e:Error) => {
-            throw e;
-          })
+          stream
+            .on('error', () => {
+              stream.destroy()
+              next();
+            })
+            .on('data', (data: any) => {
+              if (!headersSent) {
+                res.set('Cache-Control', `public, max-age=${maxAge}`);
+                res.set('content-type', 'application/json');
+                res.set('content-encoding', 'gzip');
+                res.set('etag', ETag);
+              }
+              headersSent = true;
+              res.write(data)
+            })
+            .on('end', () => {
+              res.end();
+            })
 
         }
       } catch (e) {
-        console.log('not cached', e)
         next();
       }
     });

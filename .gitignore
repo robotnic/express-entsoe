@@ -5,3 +5,5 @@ todo.txt
 .env
 .env-aws
 .env-test
+.env-cache
+tmp
