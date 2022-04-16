@@ -41,6 +41,7 @@ describe('Electricity Generation', () => {
         expect(body.requestInterval.start).toBe('2019-05-05T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-05-12T00:00:00.000Z');
         expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10Y1001A1001A83F&outBiddingZone_Domain=10Y1001A1001A83F&periodStart=201905050000&periodEnd=201905120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(typeof(body.sources[0].date)).toBe('string');
         done();
       })
   })
@@ -89,6 +90,36 @@ describe('Electricity Generation', () => {
         done();
       })
   })
+
+  it('Electricity Generation week France', done => {
+    request.default(app)
+      .get('/entsoe/10YFR-RTE------C/generation?year=2019&month=3&day=11')
+      .set('refresh', 'true')
+      .timeout(timeout)
+      .expect(200)
+      .then(response => {
+        const body = response.body;
+        expect(body.chartName).toBe('Generated Electricity')
+        expect(body.unit).toBe('MW')
+        expect(body.dataset.length).toBe(12)
+        expect(body.dataset[0].data.length).toBe(24)
+        expect(body.requestInterval.start).toBe('2019-03-11T00:00:00.000Z')
+        expect(body.requestInterval.end).toBe('2019-03-12T00:00:00.000Z');
+        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YFR-RTE------C&outBiddingZone_Domain=10YFR-RTE------C&periodStart=201903110000&periodEnd=201903120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+
+        body.dataset.forEach((dataset: any) => {
+          if (!dataset.color) {
+            console.log('---->',dataset.label, dataset.color,dataset.psrType)
+          }
+          expect(typeof(dataset.label)).toBe('string')
+          expect(typeof(dataset.color)).toBe('string')
+          expect(typeof(dataset.psrType)).toBe('string')
+        })
+
+        done();
+      })
+  })
+
 
   it('Solar Generation Day Austria', done => {
     request.default(app)
@@ -217,7 +248,6 @@ describe('Electricity Generation', () => {
         expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YFR-RTE------C&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
 
         body.dataset.forEach((dataset: any) => {
-          console.log(dataset.label, dataset.color,dataset.psrType)
           expect(typeof(dataset.label)).toBe('string')
           expect(typeof(dataset.color)).toBe('string')
           expect(typeof(dataset.psrType)).toBe('string')
@@ -310,7 +340,17 @@ describe('Electricity Generation', () => {
   })
 
 
-
+  it('Load Swagger', done => {
+    request.default(app)
+      .get('/entsoe')
+      .set('refresh', 'true')
+      .timeout(timeout)
+      .expect(200)
+      .then(response => {
+        const body = response.body;
+        done();
+      })
+    })
 
 
 

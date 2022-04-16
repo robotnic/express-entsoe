@@ -26,12 +26,11 @@ export class Loader {
     const countryName = this.config.CountryCodes[country];
 
     const data = charts.dataset.map(item => {
-      console.log(item);
       return {
         psrType: item.psrType,
         label: item.label,
         value: item.data?.[0].y,
-        color: this.config.colors[item?.psrType || '']
+        color: this.config.colors[item?.psrType || 'pink']
       }
     })
     const response = {
@@ -129,6 +128,7 @@ export class Loader {
     const url = `${this.entsoeDomain}${path}&securityToken=${this.securityToke}`;
     const sources = [{
       title: 'Entsoe data',
+      date: (new Date).toISOString(),
       url:`${this.entsoeDomain}${path}&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`
     }];
     const countryName = this.config.CountryCodes[country];
@@ -160,8 +160,6 @@ export class Loader {
       dataInterval: { start: start, end: end },
       humanReadableDate: hrDate,
       title: `${countryName} ${chartName} ${hrDate}`,
-
-
       dataset: dataset
     }
     return chartView;
@@ -224,6 +222,11 @@ export class Loader {
 
       }
     }
+    /*
+    charts.forEach(item => {
+      console.log(item.psrType, item.label, item.color)
+    })
+    */
     const sortedCharts = charts.sort((a, b) => {
       return this.order.indexOf(a?.psrType || '') - this.order.indexOf(b?.psrType || '');
     })

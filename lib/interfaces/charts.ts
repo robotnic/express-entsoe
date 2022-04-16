@@ -24,7 +24,8 @@ export interface Chart {
 export interface Source {
   title?: string
   description?: string
-  url?: string
+  url?: string,
+  date?: string
 }
 
 export interface Point {

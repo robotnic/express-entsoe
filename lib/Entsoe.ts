@@ -33,6 +33,7 @@ export class Entsoe {
     }
     delete entsoeConfig.awsAccessKeyId;
     delete entsoeConfig.awsSecretAccessKey;
+    console.log(awsConfig)
     config.update(awsConfig);
 
     const loader = new Loader(entsoeConfig.securityToken, entsoeDomain);
@@ -47,7 +48,7 @@ export class Entsoe {
         //const fileDirName = path.join(cacheDir, fileName);
         const ETag = req.get('If-None-Match');
         // const data = await this.getCachedFile(fileDirName, ETag);
-        const stream = await EntsoeCache.read(fileName, entsoeConfig, ETag);
+        const stream = EntsoeCache.readAWS(fileName, entsoeConfig, ETag);
         if (!stream) {
           res.sendStatus(304);
         } else {
@@ -55,10 +56,22 @@ export class Entsoe {
           res.set('content-type', 'application/json');
           res.set('content-encoding', 'gzip');
           res.set('etag', ETag);
-          stream.pipe(res);
+          /*
+          const readable = stream.on('error', (e:Error) => {
+            console.log('====+====', e);
+            stream.abort();
+            throw e;
+          });
+          */
+
+          stream.createReadStream().pipe(res)
+          .on('error', (e:Error) => {
+            throw e;
+          })
 
         }
       } catch (e) {
+        console.log('not cached', e)
         next();
       }
     });
@@ -177,8 +190,7 @@ export class Entsoe {
     })
 
 
-
-    router.get(`${basePath} `, async (req, res) => {
+    router.get(`${basePath}`, async (req, res) => {
       try {
         const data = await CreateSwagger.load(basePath);
         res.set('Cache-Control', 'public, max-age=31536000');

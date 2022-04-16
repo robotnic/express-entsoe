@@ -13,9 +13,13 @@ export class EntsoeCache {
       this.writeFile(data, filename, config);
     }
   }
-  static async read(fileName: string, config: EntsoeConfig, ETag?: string): Promise<ReadStream | undefined> {
+  static async read(fileName: string, config: EntsoeConfig, ETag?: string): Promise<any | undefined> {
     if (config.awsBucket) {
+      try {
       return this.readAWS(fileName, config, ETag);
+      } catch(e) {
+        console.log(9999);
+      }
     } else {
       return this.readFile(fileName, config, ETag);
     }
@@ -56,7 +60,8 @@ export class EntsoeCache {
 
   static async writeAWS(data: Buffer, name: string, config: EntsoeConfig): Promise<string | undefined> {
     name = 'entsoeCache/' + name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-
+    name = this.makeName(name);
+    console.log(name);
     const params: any = {
       Bucket: config.awsBucket,
       Key: name,
@@ -67,8 +72,10 @@ export class EntsoeCache {
     return uploadPromise.ETag;
   }
 
-  static async readAWS(name: string, config: EntsoeConfig, eTag?: string): Promise<any | undefined> {
-    name = 'entsoeCache/' + name;
+  static readAWS(name: string, config: EntsoeConfig, eTag?: string): any | undefined {
+    //name = 'entsoeCache/' + name;
+    name = this.makeName(name);
+    console.log('aws', name)
     const params: GetObjectRequest = {
       Bucket: config.awsBucket || '',
       Key: name,
@@ -77,14 +84,20 @@ export class EntsoeCache {
 
     const s3 = new S3();
     try {
-      const data = await s3.getObject(params).promise();
-      return data.Body;
+
+      const stream = s3.getObject(params);
+      return stream;
     } catch (e: any) {
       if (e.code === 'NotModified') {
         return;
       } else {
+        console.log(e);
         throw e;
       }
     }
+  }
+
+  static makeName(name:string):string {
+    return 'entsoeCache/' + name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
   }
 }
