@@ -41,7 +41,7 @@ export class Entsoe {
 
 
     router.use(async (req, res, next) => {
-      if (req.headers?.refresh) {
+      if (req.headers?.refresh === 'true') {
         next()
       } else {
         const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
@@ -211,7 +211,6 @@ export class Entsoe {
         res.set('content-type', 'application/json');
         res.set('content-encoding', 'gzip');
         const ETag = await EntsoeCache.write(result, req.url, config);
-        console.log('--------', ETag)
         if (ETag) {
           res.set('ETag', ETag);  //aws ETag
         }
