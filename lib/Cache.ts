@@ -1,6 +1,6 @@
 import { AWSError, S3 } from 'aws-sdk';
 import { GetObjectRequest } from 'aws-sdk/clients/s3';
-import { createReadStream, writeFile, promises, ReadStream } from 'fs';
+import { createReadStream, promises, ReadStream } from 'fs';
 import path from 'path';
 import { EntsoeConfig } from './interfaces/entsoeCache';
 
@@ -10,7 +10,7 @@ export class EntsoeCache {
     if (config.awsBucket) {
       return this.writeAWS(data, filename, config);
     } else {
-      this.writeFile(data, filename, config);
+      return this.writeFile(data, filename, config);
     }
   }
   static async read(fileName: string, config: EntsoeConfig, ETag?: string): Promise<any | undefined> {
@@ -22,25 +22,40 @@ export class EntsoeCache {
   }
 
 
-  static async writeFile(data: Buffer, filename: string, config?: EntsoeConfig): Promise<void> {
+  static async writeFile(data: Buffer, filename: string, config?: EntsoeConfig): Promise<string|undefined> {
     if (config?.cacheDir) {
       //const fileName = filename.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      const fileDirName = path.join(config.cacheDir, filename);
-      writeFile(fileDirName, data, (e) => {
+      const fileDirName = this.makeName(config.cacheDir, filename);
+      try {
+        await promises.writeFile(fileDirName, data)
+        const stats = await promises.stat(fileDirName);
+        const fileTime = (new Date(stats.mtime)).getTime() + '';
+        return fileTime;
+      } catch (e) {
+        console.log(e);
+      }
+      /*
+      writeFile(fileDirName, data, async (e) => {
         if (e instanceof Error) {
           console.log(e.message);
         } else {
           console.log(e);
         }
-        return;
+        const stats = await promises.stat(fileDirName);
+        console.log(stats);
+        const fileTime = (new Date(stats.mtime)).getTime() + '';
+        console.log(fileTime)
+        return fileTime;
       })
+      */
     }
   }
 
-  static async readFile(fileName: string, config: EntsoeConfig, ETag?: string): Promise<ReadStream | undefined> {
+  static async readFile(fileName: string, config: EntsoeConfig, ETag?: string): Promise<any | undefined> {
     if (config.cacheDir) {
       //      const fileDirName = path.join(config.cacheDir, fileName);
       const fileDirName = this.makeName(config.cacheDir, fileName);
+//      console.log(fileDirName);
       const stats = await promises.stat(fileDirName);
       const fileTime = (new Date(stats.mtime)).getTime() + '';
 
@@ -48,7 +63,10 @@ export class EntsoeCache {
         return;
       }
       const stream = createReadStream(fileDirName);
-      return stream;
+      return {
+        file:stream,
+        ETag: fileTime
+      }
     }
     throw new Error('no cache dir found')
   }
@@ -86,7 +104,8 @@ export class EntsoeCache {
           }
           reject(error);
         } else {
-          resolve(data.Body);
+          //data.Body?.toString('base64')
+          resolve(data);
         }
       })
     });

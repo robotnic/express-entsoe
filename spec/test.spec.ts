@@ -54,6 +54,30 @@ describe('Electricity Generation', () => {
       .timeout(timeout)
       .expect(200)
       .then(response => {
+//        console.log(response.headers)
+        request.default(app)
+          .get('/entsoe/10Y1001A1001A83F/generation?year=2019&week=19&day=15')
+          .set('If-None-Match', response.headers?.etag || '')
+          .timeout(timeout)
+          .expect(304)
+          .then(response2 => {
+            expect(response2.headers.eTag).toBe(response2?.headers?.eTag)
+            done();
+          });
+      })
+  })
+
+  it('Electricity Generation Day Germany Etag not valid', done => {
+    request.default(app)
+      .get('/entsoe/10Y1001A1001A83F/generation?year=2019&week=19&day=15')
+      //.set('refresh', 'true')
+//      .set('If-None-Match', '36c35e1e8fec346dc78def0ac402d98c')
+      .timeout(timeout)
+      .expect(200)
+      .then(response => {
+//        console.log(response.headers)
+        done()
+        /*
         request.default(app)
           .get('/entsoe/10Y1001A1001A83F/generation?year=2019&week=19&day=15')
           .set('If-None-Match', response.headers.etag)
@@ -63,8 +87,10 @@ describe('Electricity Generation', () => {
             expect(response2.headers.eTag).toBe(response.headers.eTag)
             done();
           });
+          */
       })
   })
+
 
   it('Electricity Generation Day Germany', done => {
     request.default(app)

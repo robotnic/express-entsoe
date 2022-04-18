@@ -41,14 +41,30 @@ export class Entsoe {
 
 
     router.use(async (req, res, next) => {
-      let headersSent = false;
       const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
       try {
-        const ETag = req.get('if-none-match');
+        const ETag = req.headers['if-none-match'];
+//        console.log('request etag', ETag)
+
         const stream = await EntsoeCache.read(fileName, entsoeConfig, ETag);
         if (!stream) {
+          res.set('etag', ETag);
           return res.sendStatus(304);
         } else {
+          res.set('Cache-Control', `public, max-age=${maxAge}`);
+          res.set('content-type', 'application/json');
+          res.set('content-encoding', 'gzip');
+          if (stream.Body) {
+            //          console.log(stream);
+            //stream.pipe(res);
+            res.set('etag', stream.ETag);
+            //res.send(stream.toString('base64'));
+            res.end(stream.Body, 'binary')
+          } else {
+            res.set('etag', stream.ETag);
+            stream.file.pipe(res);
+          }
+          /*
           stream
             .on('error', (e:any) => {
               stream.destroy()
@@ -65,14 +81,16 @@ export class Entsoe {
               res.write(data)
             })
             .on('end', () => {
+              console.log('got it from s3')
               res.end();
             })
-
+*/
         }
-      } catch (e:any) {
+      } catch (e: any) {
         if (e.code !== 'NotModified') {
+          //console.log('e1', e)
           next();
-        }else{
+        } else {
           res.sendStatus(304)
         }
       }
@@ -210,11 +228,12 @@ export class Entsoe {
   private static cacheAndSend(req: express.Request, res: express.Response, data: ChartGroup, config: EntsoeConfig): void {
     const buf = Buffer.from(JSON.stringify(data), 'utf-8');
     gzip(buf, async (_, result) => {
-      res.set('etag', (new Date()).getTime() + '');  //assuming the file will be writen in same second
+      //res.set('etag', (new Date()).getTime() + '');  //assuming the file will be writen in same second
       if (req.get('accept-encoding')?.indexOf('gzip') !== -1) {
         res.set('content-type', 'application/json');
         res.set('content-encoding', 'gzip');
         const ETag = await EntsoeCache.write(result, req.url, config);
+        console.log('--------', ETag)
         if (ETag) {
           res.set('ETag', ETag);  //aws ETag
         }
