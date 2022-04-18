@@ -41,57 +41,35 @@ export class Entsoe {
 
 
     router.use(async (req, res, next) => {
-      const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      try {
-        const ETag = req.headers['if-none-match'];
-//        console.log('request etag', ETag)
-
-        const stream = await EntsoeCache.read(fileName, entsoeConfig, ETag);
-        if (!stream) {
-          res.set('etag', ETag);
-          return res.sendStatus(304);
-        } else {
-          res.set('Cache-Control', `public, max-age=${maxAge}`);
-          res.set('content-type', 'application/json');
-          res.set('content-encoding', 'gzip');
-          if (stream.Body) {
-            //          console.log(stream);
-            //stream.pipe(res);
-            res.set('etag', stream.ETag);
-            //res.send(stream.toString('base64'));
-            res.end(stream.Body, 'binary')
+      if (req.headers?.refresh) {
+        next()
+      } else {
+        const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        try {
+          const ETag = req.headers['if-none-match'];
+          const stream = await EntsoeCache.read(fileName, entsoeConfig, ETag);
+          if (!stream) {
+            res.set('etag', ETag);
+            return res.sendStatus(304);
           } else {
-            res.set('etag', stream.ETag);
-            stream.file.pipe(res);
+            res.set('Cache-Control', `public, max-age=${maxAge}`);
+            res.set('content-type', 'application/json');
+            res.set('content-encoding', 'gzip');
+            if (stream.Body) {
+              res.set('etag', stream.ETag);
+              res.end(stream.Body, 'binary')
+            } else {
+              res.set('etag', stream.ETag);
+              stream.file.pipe(res);
+            }
           }
-          /*
-          stream
-            .on('error', (e:any) => {
-              stream.destroy()
-              next();
-            })
-            .on('data', (data: any) => {
-              if (!headersSent) {
-                res.set('Cache-Control', `public, max-age=${maxAge}`);
-                res.set('content-type', 'application/json');
-                res.set('content-encoding', 'gzip');
-                res.set('etag', ETag);
-              }
-              headersSent = true;
-              res.write(data)
-            })
-            .on('end', () => {
-              console.log('got it from s3')
-              res.end();
-            })
-*/
-        }
-      } catch (e: any) {
-        if (e.code !== 'NotModified') {
-          //console.log('e1', e)
-          next();
-        } else {
-          res.sendStatus(304)
+        } catch (e: any) {
+          if (e.code !== 'NotModified') {
+            //console.log('e1', e)
+            next();
+          } else {
+            res.sendStatus(304)
+          }
         }
       }
     });
