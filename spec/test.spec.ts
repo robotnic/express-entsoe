@@ -26,7 +26,6 @@ describe('Electricity Generation', () => {
   } else {
     console.log('process.env.securityToken missing')
   }
-
   it('Electricity Generation Week Germany', done => {
     request.default(app)
       .get('/entsoe/10Y1001A1001A83F/generation?year=2019&week=19')
@@ -42,8 +41,28 @@ describe('Electricity Generation', () => {
         expect(body.requestInterval.start).toBe('2019-05-05T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-05-12T00:00:00.000Z');
         expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10Y1001A1001A83F&outBiddingZone_Domain=10Y1001A1001A83F&periodStart=201905050000&periodEnd=201905120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
-        expect(typeof(body.sources[0].date)).toBe('string');
+        expect(typeof (body.sources[0].date)).toBe('string');
         done();
+      })
+  })
+
+  it('Electricity Generation Day Germany Etag', done => {
+    request.default(app)
+      .get('/entsoe/10Y1001A1001A83F/generation?year=2019&week=19&day=15')
+      .set('refresh', 'true')
+      //.set('If-None-Match', '36c35e1e8fec346dc78def0ac402d98c')
+      .timeout(timeout)
+      .expect(200)
+      .then(response => {
+        request.default(app)
+          .get('/entsoe/10Y1001A1001A83F/generation?year=2019&week=19&day=15')
+          .set('If-None-Match', response.headers.etag)
+          .timeout(timeout)
+          .expect(304)
+          .then(response2 => {
+            expect(response2.headers.eTag).toBe(response.headers.eTag)
+            done();
+          });
       })
   })
 
@@ -83,9 +102,9 @@ describe('Electricity Generation', () => {
         expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=201903110000&periodEnd=201903120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
 
         body.dataset.forEach((dataset: any) => {
-          expect(typeof(dataset.label)).toBe('string')
-          expect(typeof(dataset.color)).toBe('string')
-          expect(typeof(dataset.psrType)).toBe('string')
+          expect(typeof (dataset.label)).toBe('string')
+          expect(typeof (dataset.color)).toBe('string')
+          expect(typeof (dataset.psrType)).toBe('string')
         })
 
         done();
@@ -110,11 +129,11 @@ describe('Electricity Generation', () => {
 
         body.dataset.forEach((dataset: any) => {
           if (!dataset.color) {
-            console.log('---->',dataset.label, dataset.color,dataset.psrType)
+            console.log('---->', dataset.label, dataset.color, dataset.psrType)
           }
-          expect(typeof(dataset.label)).toBe('string')
-          expect(typeof(dataset.color)).toBe('string')
-          expect(typeof(dataset.psrType)).toBe('string')
+          expect(typeof (dataset.label)).toBe('string')
+          expect(typeof (dataset.color)).toBe('string')
+          expect(typeof (dataset.psrType)).toBe('string')
         })
 
         done();
@@ -223,9 +242,9 @@ describe('Electricity Generation', () => {
         expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YAT-APG------L&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
 
         body.dataset.forEach((dataset: any) => {
-          expect(typeof(dataset.label)).toBe('string')
-          expect(typeof(dataset.color)).toBe('string')
-          expect(typeof(dataset.psrType)).toBe('string')
+          expect(typeof (dataset.label)).toBe('string')
+          expect(typeof (dataset.color)).toBe('string')
+          expect(typeof (dataset.psrType)).toBe('string')
         })
 
 
@@ -249,9 +268,9 @@ describe('Electricity Generation', () => {
         expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YFR-RTE------C&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
 
         body.dataset.forEach((dataset: any) => {
-          expect(typeof(dataset.label)).toBe('string')
-          expect(typeof(dataset.color)).toBe('string')
-          expect(typeof(dataset.psrType)).toBe('string')
+          expect(typeof (dataset.label)).toBe('string')
+          expect(typeof (dataset.color)).toBe('string')
+          expect(typeof (dataset.psrType)).toBe('string')
         })
 
 
@@ -351,8 +370,7 @@ describe('Electricity Generation', () => {
         const body = response.body;
         done();
       })
-    })
-
+  })
 
 
 })

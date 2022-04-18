@@ -33,7 +33,6 @@ export class Entsoe {
     }
     delete entsoeConfig.awsAccessKeyId;
     delete entsoeConfig.awsSecretAccessKey;
-    console.log(awsConfig)
     config.update(awsConfig);
 
     const loader = new Loader(entsoeConfig.securityToken, entsoeDomain);
@@ -45,16 +44,13 @@ export class Entsoe {
       let headersSent = false;
       const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
       try {
-
-        //const fileDirName = path.join(cacheDir, fileName);
-        const ETag = req.get('If-None-Match');
-        // const data = await this.getCachedFile(fileDirName, ETag);
+        const ETag = req.get('if-none-match');
         const stream = await EntsoeCache.read(fileName, entsoeConfig, ETag);
         if (!stream) {
-          res.sendStatus(304);
+          return res.sendStatus(304);
         } else {
           stream
-            .on('error', () => {
+            .on('error', (e:any) => {
               stream.destroy()
               next();
             })
@@ -73,8 +69,12 @@ export class Entsoe {
             })
 
         }
-      } catch (e) {
-        next();
+      } catch (e:any) {
+        if (e.code !== 'NotModified') {
+          next();
+        }else{
+          res.sendStatus(304)
+        }
       }
     });
 

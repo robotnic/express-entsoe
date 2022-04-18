@@ -1,8 +1,7 @@
-import { S3 } from 'aws-sdk';
+import { AWSError, S3 } from 'aws-sdk';
 import { GetObjectRequest } from 'aws-sdk/clients/s3';
 import { createReadStream, writeFile, promises, ReadStream } from 'fs';
 import path from 'path';
-import internal from 'stream';
 import { EntsoeConfig } from './interfaces/entsoeCache';
 
 export class EntsoeCache {
@@ -69,7 +68,7 @@ export class EntsoeCache {
     return uploadPromise.ETag;
   }
 
-  static readAWS(name: string, config: EntsoeConfig, eTag?: string): internal.Readable | undefined {
+  static readAWS(name: string, config: EntsoeConfig, eTag?: string): Promise<any | undefined> {
     //name = 'entsoeCache/' + name;
     name = this.makeName(config.cacheDir, name);
     const params: GetObjectRequest = {
@@ -79,18 +78,18 @@ export class EntsoeCache {
     };
 
     const s3 = new S3();
-    try {
-
-      const stream = s3.getObject(params)
-      return stream.createReadStream();
-    } catch (e: any) {
-      if (e.code === 'NotModified') {
-        return;
-      } else {
-        console.log(e);
-        throw e;
-      }
-    }
+    return new Promise((resolve, reject) => {
+      s3.getObject(params, (error: AWSError, data: S3.GetObjectOutput) => {
+        if (error) {
+          if (error.code === 'NotModified') {
+            reject(error)
+          }
+          reject(error);
+        } else {
+          resolve(data.Body);
+        }
+      })
+    });
   }
 
   static makeName(cacheDir = '', name: string): string {
