@@ -30,7 +30,7 @@ export class Loader {
         psrType: item.psrType,
         label: item.label,
         value: item.data?.[0].y,
-        color: this.config.colors[item?.psrType || 'pink']
+        color: this.config.colors[item.psrType ||''] || 'pink'
       }
     })
     const response = {
@@ -216,7 +216,7 @@ export class Loader {
         } else {
           chartsByPsrType[key].label = this.config.PsrType[theKey];
         }
-        chartsByPsrType[key].color = this.config.colors[key];
+        chartsByPsrType[key].color = this.config.colors[theKey];
         chartsByPsrType[key].psrType = theKey;
         charts.push(chartsByPsrType[key]);
 

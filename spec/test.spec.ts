@@ -29,7 +29,7 @@ describe('Electricity Generation', () => {
   it('Electricity Generation Week Germany', done => {
     request.default(app)
       .get('/entsoe/10Y1001A1001A83F/generation?year=2019&week=19')
-      .set('refresh', 'true')
+      .set('refresh', 'false')
       .timeout(timeout)
       .expect(200)
       .then(response => {
@@ -155,7 +155,7 @@ describe('Electricity Generation', () => {
 
         body.dataset.forEach((dataset: any) => {
           if (!dataset.color) {
-            console.log('---->', dataset.label, dataset.color, dataset.psrType)
+          // console.log('---->', dataset.label, dataset.color, dataset.psrType)
           }
           expect(typeof (dataset.label)).toBe('string')
           expect(typeof (dataset.color)).toBe('string')
@@ -165,6 +165,35 @@ describe('Electricity Generation', () => {
         done();
       })
   })
+
+  it('Electricity Generation week France - negative values', done => {
+    request.default(app)
+      .get('/entsoe/10YFR-RTE------C/generation?year=2021')
+      .set('refresh', 'false')
+      .timeout(timeout)
+      .expect(200)
+      .then(response => {
+        const body = response.body;
+        expect(body.chartName).toBe('Generated Electricity')
+        expect(body.unit).toBe('MW')
+        expect(body.dataset.length).toBe(14)
+        expect(body.dataset[0].data.length).toBe(8760)
+        expect(body.requestInterval.start).toBe('2021-01-01T00:00:00.000Z');
+        expect(body.requestInterval.end).toBe('2022-01-01T00:00:00.000Z');
+        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YFR-RTE------C&outBiddingZone_Domain=10YFR-RTE------C&periodStart=202101010000&periodEnd=202201010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        //console.log(body.dataset.map((item:any) => item.label))
+        body.dataset.forEach((dataset: any) => {
+          //console.log('---->', dataset.label, dataset.color, dataset.psrType)
+          expect(typeof (dataset.label)).toBe('string')
+          expect(typeof (dataset.color)).toBe('string')
+          expect(typeof (dataset.psrType)).toBe('string')
+        })
+
+        done();
+      })
+  })
+
+
 
 
   it('Solar Generation Day Austria', done => {
