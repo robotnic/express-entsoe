@@ -63,6 +63,7 @@ export class Entsoe {
               stream.file.pipe(res);
             }
           }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
           if (e.code !== 'NotModified') {
             //console.log('e1', e)
