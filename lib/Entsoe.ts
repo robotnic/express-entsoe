@@ -8,6 +8,7 @@ import { ChartGroup } from './interfaces/charts';
 import { EntsoeCache } from './Cache';
 import { EntsoeConfig } from './interfaces/entsoeCache';
 import { ConfigurationOptions, config } from 'aws-sdk';
+import axios from 'axios';
 
 
 export class Entsoe {
@@ -245,7 +246,12 @@ export class Entsoe {
       return res.status(e.rfc7807.status).send(e.rfc7807)
     }
     console.trace(e.message);
-    return res.status(500).send('unexpected internal error');
+    if (axios.isAxiosError(e)) {
+      console.log(`ENTSOE ERROR ${e.response?.status} ${e.response?.statusText}`)
+      return res.status(e.response?.status || 500).send(`ENTSOE ERROR ${e.response?.statusText}`);
+    } else {
+      return res.status(500).send('unexpected internal error');
+    }
   }
 
   /*

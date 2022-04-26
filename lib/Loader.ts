@@ -138,7 +138,7 @@ export class Loader {
     //      console.log(url);
     const options = { headers: { 'User-Agent': 'Caching proxy for https://www.powercalculator.eu/' }  }
     const response = await axios.get(url, options);
-    //      console.log(response.data);
+    // console.log(response);
     const json = await parseStringPromise(response.data) as Entsoe;
     let dataset;
     let start;
