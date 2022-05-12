@@ -76,8 +76,8 @@ export class EntsoeCache {
   static async writeAWS(data: Buffer, name: string, config: EntsoeConfig): Promise<string | undefined> {
     //    name = 'entsoeCache/' + name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
     name = this.makeName(config.cacheDir, name);
-    const params: any = {
-      Bucket: config.awsBucket,
+    const params: S3.PutObjectRequest = {
+      Bucket: config.awsBucket ||'',
       Key: name,
       Body: data
     };
@@ -105,6 +105,7 @@ export class EntsoeCache {
           reject(error);
         } else {
           //data.Body?.toString('base64')
+          //console.log('read meta', data)
           resolve(data);
         }
       })

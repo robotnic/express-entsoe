@@ -1,13 +1,13 @@
 {
   "name": "express-entsoe",
-  "version": "0.5.30",
+  "version": "0.5.32",
   "main": "dist/index.js",
   "scripts": {
     "test": "env-cmd -f .env-test jasmine --config=spec/jasmine.json",
     "test:aws": "env-cmd -f .env-aws jasmine --config=spec/jasmine.json",
     "test:cache": "env-cmd -f .env-cache jasmine --config=spec/jasmine.json",
     "start": "ts-node index.ts",
-    "build": "rm -r dist && tsc --project tsconfig-build.json",
+    "build": "rimraf -r dist && tsc --project tsconfig-build.json",
     "lint": "eslint . --ext .ts"
   },
   "author": "",
@@ -41,6 +41,7 @@
     "jasmine-ts": "^0.4.0",
     "node-fetch": "^3.2.3",
     "openapi-types": "^9.3.0",
+    "rimraf": "^3.0.2",
     "supertest": "^6.1.6",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.2"

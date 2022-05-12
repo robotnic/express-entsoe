@@ -70,6 +70,9 @@ export class Entsoe {
             //console.log('e1', e)
             next();
           } else {
+            const ETag = req.headers['if-none-match'];
+            res.set('etag', ETag);
+            res.set('Cache-Control', `public, max-age=${maxAge}`);
             res.sendStatus(304)
           }
         }

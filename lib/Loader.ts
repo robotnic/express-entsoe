@@ -4,7 +4,7 @@ import { Chart, ChartGroup, Point, Source } from "./interfaces/charts";
 import { Entsoe, EntsoeDocument, EntsoePeriod, EntsoePoint } from "./interfaces/entsoe";
 import { Config, ConfigType } from "./Config";
 import { Duration, Period } from 'js-joda';
-import { addSeconds, differenceInDays, parse} from 'date-fns';
+import { addSeconds, differenceInDays, max, parse } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { InputError, UpstreamError } from "./Errors";
 import { Country } from "./interfaces/countries";
@@ -30,7 +30,7 @@ export class Loader {
         psrType: item.psrType,
         label: item.label,
         value: item.data?.[0].y,
-        color: this.config.colors[item.psrType ||''] || 'pink'
+        color: this.config.colors[item.psrType || ''] || 'pink'
       }
     })
     const response = {
@@ -128,15 +128,14 @@ export class Loader {
     const url = `${this.entsoeDomain}${path}&securityToken=${this.securityToke}`;
     const sources = [{
       title: 'Entsoe data',
-      date: (new Date).toISOString(),
-      url:`${this.entsoeDomain}${path}&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`
+      url: `${this.entsoeDomain}${path}&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`
     }];
     const countryName = this.config.CountryCodes[country];
     const chartName = this.config.chartNames[chartType];
 
 
     //      console.log(url);
-    const options = { headers: { 'User-Agent': 'Caching proxy for https://www.powercalculator.eu/' }  }
+    const options = { headers: { 'User-Agent': 'Caching proxy for https://www.powercalculator.eu/' } }
     const response = await axios.get(url, options);
     // console.log(response);
     const json = await parseStringPromise(response.data) as Entsoe;
@@ -174,7 +173,7 @@ export class Loader {
     const chartsByPsrType: {
       [key: string]: Chart
     } = {};
-    orig?.TimeSeries.forEach(timeSeries => {
+    orig?.TimeSeries.forEach((timeSeries, index) => {
       let i = 0;
       const period = timeSeries.Period[0];
       const durationInSeconds = this.getPeriodInSeconds(period);
@@ -209,20 +208,23 @@ export class Loader {
       }
     });
     for (const key of Object.keys(chartsByPsrType)) {
-      const isAllZero = chartsByPsrType[key].data?.every(item => Math.abs(item.y) < 10);
-      if (!isAllZero) {
-        const theKey = key.split('___')[0];
-        if (key.endsWith('___in')) {
-          chartsByPsrType[key].label = this.config.PsrType[theKey] + ' Up';
-        } else {
-          chartsByPsrType[key].label = this.config.PsrType[theKey];
+      const typeChart = chartsByPsrType[key];
+      if (Array.isArray(typeChart?.data)) {
+        const isAllZero = chartsByPsrType[key].data?.every(item => Math.abs(item.y) < 10);
+        if (!isAllZero) {
+          const theKey = key.split('___')[0];
+          if (key.endsWith('___in')) {
+            typeChart.label = this.config.PsrType[theKey] + ' Up';
+          } else {
+            typeChart.label = this.config.PsrType[theKey];
+          }
+          typeChart.color = this.config.colors[theKey];
+          typeChart.psrType = theKey;
+          charts.push(typeChart);
         }
-        chartsByPsrType[key].color = this.config.colors[theKey];
-        chartsByPsrType[key].psrType = theKey;
-        charts.push(chartsByPsrType[key]);
-
       }
     }
+    this.removeNullsAtTheEnd(charts);
     /*
     charts.forEach(item => {
       console.log(item.psrType, item.label, item.color)
@@ -258,6 +260,22 @@ export class Loader {
       }
     }
     return pointArray;
+  }
+
+  removeNullsAtTheEnd(charts: Chart[]): void {
+    let longest = 0;
+    charts.forEach(chart => {
+      chart.data?.forEach((item, i) => {
+        if (i > longest && item.y) {
+          longest = i;
+        }
+      })
+    })
+    charts.forEach(chart => {
+      if (chart.data) {
+        chart.data.length = (longest + 1);
+      }
+    })
   }
 
   getYValue(item: EntsoePoint, sign: number): number {

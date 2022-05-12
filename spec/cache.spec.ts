@@ -57,8 +57,7 @@ describe('AWS Cache test', () => {
           .timeout(timeout)
           .expect(200)
           .then(response2 => {
-            expect(response.body.sources[0].date).not.toBe(response2.body.sources[0].date)
-            expect(response.headers.etag).not.toBe(response2.headers.etag)
+            expect(response.headers.etag).toBe(response2.headers.etag)
             done();
           })
       })
@@ -83,29 +82,5 @@ describe('AWS Cache test', () => {
           })
       })
   })
-
-  it('Test ETag + refresh', done => {
-    request.default(app)
-      .get('/entsoe/10Y1001A1001A83F/generation?year=2017&week=30')
-      .set('refresh', 'false')
-      .timeout(timeout)
-      .expect(200)
-      .then(response => {
-        const etag = response.headers.etag;
-        request.default(app)
-          .get('/entsoe/10Y1001A1001A83F/generation?year=2017&week=30')
-          .set('if-none-match', etag)
-          .set('refresh', 'true')
-          .timeout(timeout)
-          .expect(200)
-          .then(response2 => {
-            expect(response.body.sources[0].date).not.toBe(response2.body.sources[0].date)
-            done();
-          })
-      })
-  })
-
-
-
 
 })

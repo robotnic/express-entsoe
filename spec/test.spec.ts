@@ -41,7 +41,6 @@ describe('Electricity Generation', () => {
         expect(body.requestInterval.start).toBe('2019-05-05T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-05-12T00:00:00.000Z');
         expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10Y1001A1001A83F&outBiddingZone_Domain=10Y1001A1001A83F&periodStart=201905050000&periodEnd=201905120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
-        expect(typeof (body.sources[0].date)).toBe('string');
         done();
       })
   })
@@ -207,7 +206,7 @@ describe('Electricity Generation', () => {
         expect(body.chartName).toBe('Generated Electricity')
         expect(body.unit).toBe('MW')
         expect(body.dataset.length).toBe(1)
-        expect(body.dataset[0].data.length).toBe(96)
+        expect(body.dataset[0].data.length).toBe(72)
         expect(body.requestInterval.start).toBe('2019-03-11T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-03-12T00:00:00.000Z');
         expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=201903110000&periodEnd=201903120000&psrType=B16&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
@@ -269,7 +268,7 @@ describe('Electricity Generation', () => {
         expect(body.chartName).toBe('Hydro Power Fill Level')
         expect(body.unit).toBe('MWh')
         expect(body.dataset.length).toBe(1)
-        expect(body.dataset[0].data.length).toBe(5)
+        expect(body.dataset[0].data.length).toBe(4)
         expect(body.requestInterval.start).toBe('2021-03-01T00:00:00.000Z');
         expect(body.requestInterval.end).toBe('2021-04-01T00:00:00.000Z');
         const startTime = new Date(body.dataInterval.start).getTime();
