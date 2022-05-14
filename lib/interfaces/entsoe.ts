@@ -7,7 +7,8 @@ export interface Entsoe {
 export interface EntsoeDocument {
   TimeSeries: TimeSeries[],
   'period.timeInterval'?: TimeInterval[]
-  'time_Period.timeInterval'?: TimeInterval[]
+  'time_Period.timeInterval'?: TimeInterval[],
+  type?: string[]
 }
 
 interface TimeSeries {

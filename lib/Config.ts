@@ -57,7 +57,8 @@ export class Config {
         "B21": "AC Link",
         "B22": "DC Link",
         "B23": "Substation",
-        "B24": "Transformer"
+        "B24": "Transformer",
+        "X72": "Hydrofill"
       },
       "BusinessType": {
         "A29": "Already allocated capacity (AAC)",
@@ -318,13 +319,15 @@ export class Config {
         "B16": "#fcd440",
         "B17": "#004000",
         "B18": "#7bf4ff",
-        "B19": "#77d8fe"
+        "B19": "#77d8fe",
+        "X72": "blue"
       },
       chartNames: {
         "installed": "Installed Power",
         "generation": "Generated Electricity",
         "prices": "Day Ahead Prices",
         "hydrofill": "Hydro Power Fill Level",
+        "load": "Electricity Consumption",
       }
 
     }

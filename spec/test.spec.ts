@@ -53,7 +53,7 @@ describe('Electricity Generation', () => {
       .timeout(timeout)
       .expect(200)
       .then(response => {
-//        console.log(response.headers)
+        //        console.log(response.headers)
         request.default(app)
           .get('/entsoe/10Y1001A1001A83F/generation?year=2019&week=19&day=15')
           .set('If-None-Match', response.headers?.etag || '')
@@ -70,11 +70,11 @@ describe('Electricity Generation', () => {
     request.default(app)
       .get('/entsoe/10Y1001A1001A83F/generation?year=2019&week=19&day=15')
       //.set('refresh', 'true')
-//      .set('If-None-Match', '36c35e1e8fec346dc78def0ac402d98c')
+      //      .set('If-None-Match', '36c35e1e8fec346dc78def0ac402d98c')
       .timeout(timeout)
       .expect(200)
       .then(response => {
-//        console.log(response.headers)
+        //        console.log(response.headers)
         done()
         /*
         request.default(app)
@@ -154,7 +154,7 @@ describe('Electricity Generation', () => {
 
         body.dataset.forEach((dataset: any) => {
           if (!dataset.color) {
-          // console.log('---->', dataset.label, dataset.color, dataset.psrType)
+            // console.log('---->', dataset.label, dataset.color, dataset.psrType)
           }
           expect(typeof (dataset.label)).toBe('string')
           expect(typeof (dataset.color)).toBe('string')
@@ -232,7 +232,7 @@ describe('Electricity Generation', () => {
         done();
       })
   })
-
+/*
   it('Hydro fill Month Austria Feb', done => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/hydrofill?year=2021&month=2')
@@ -255,6 +255,33 @@ describe('Electricity Generation', () => {
         done();
       })
   })
+  it('Hydro fill Month Austria 2020', done => {
+    request.default(app)
+      .get('/entsoe/10YAT-APG------L/hydrofill?year=2020')
+      .set('refresh', 'true')
+      .timeout(timeout)
+      .expect(200)
+      .then(response => {
+        const body = response.body;
+        console.log(body.dataset[0].data);
+        expect(body.chartName).toBe('Hydro Power Fill Level')
+        expect(body.unit).toBe('MWh')
+        expect(body.dataset.length).toBe(1)
+        expect(body.dataset[0].data.length).toBe(53)
+        body.dataset[0].data.forEach((item: any) => {
+          console.log(item.y);
+        })
+        expect(body.requestInterval.start).toBe('2020-01-01T00:00:00.000Z');
+        expect(body.requestInterval.end).toBe('2021-01-01T00:00:00.000Z');
+        const startTime = new Date(body.dataInterval.start).getTime();
+        const endTime = new Date(body.dataInterval.end).getTime();
+        expect(startTime).toBeLessThanOrEqual((new Date('2020-01-01T00:00Z').getTime()));
+        expect(endTime).toBeGreaterThanOrEqual((new Date('2021-01-01T00:00Z')).getTime() - 3600000)
+        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202001010000&periodEnd=202101010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        done();
+      })
+  })
+
 
 
   it('Hydro fill Month Austria March', done => {
@@ -279,7 +306,7 @@ describe('Electricity Generation', () => {
         done();
       })
   })
-
+*/
   it('Installed Generation Austria 2020', done => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/installed?year=2020')

@@ -125,16 +125,16 @@ export class Loader {
     if (psrType) {
       path = `${path}&psrType=${psrType}`
     }
+    const chartName = this.config.chartNames[chartType];
     const url = `${this.entsoeDomain}${path}&securityToken=${this.securityToke}`;
     const sources = [{
-      title: 'Entsoe data',
+      title: 'Entsoe data ${chartName} ${countryName}',
       url: `${this.entsoeDomain}${path}&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`
     }];
     const countryName = this.config.CountryCodes[country];
-    const chartName = this.config.chartNames[chartType];
 
 
-    //      console.log(url);
+    console.log(url);
     const options = { headers: { 'User-Agent': 'Caching proxy for https://www.powercalculator.eu/' } }
     const response = await axios.get(url, options);
     // console.log(response);
@@ -179,6 +179,11 @@ export class Loader {
       const durationInSeconds = this.getPeriodInSeconds(period);
       const start2 = new Date(period.timeInterval[0].start[0]);
       let psrType = timeSeries.MktPSRType?.[0].psrType[0] || 'unknown';
+      if (psrType === 'unknown') {
+        if (orig?.type?.[0] === 'A72') {
+          psrType = 'X72'
+        }
+      }
       let sign = 1;
       if (timeSeries['outBiddingZone_Domain.mRID']) {
         psrType = psrType + '___in';
@@ -242,8 +247,40 @@ export class Loader {
         const sourcePoint = addedPoints.find(point => point.x === targetPoint.x);
         if (sourcePoint) {
           targetPoint.y = sourcePoint.y;
+          addedPoints = addedPoints.filter(point => point.x !== targetPoint.x);
         }
       })
+      // not found, find the nearest
+      if (addedPoints.length > 0) {
+        const times = target.map((item: any) => (new Date(item.x).getTime()))
+        addedPoints.forEach(point => {
+          const index = this.findClosestIndex(times, (new Date(point.x)).getTime());
+          if (target[index] && target[index].y === 0) {
+            target[index].y = point.y;
+          }
+        })
+      }
+    }
+  }
+
+  findClosestIndex(arr: any[], element: number):number {
+    let from = 0, until = arr.length - 1
+    while (true) {
+      const cursor = Math.floor((from + until) / 2);
+      if (cursor === from) {
+        const diff1 = element - arr[from];
+        const diff2 = arr[until] - element;
+        return diff1 <= diff2 ? from : until;
+      }
+
+      const found = arr[cursor];
+      if (found === element) return cursor;
+
+      if (found > element) {
+        until = cursor;
+      } else if (found < element) {
+        from = cursor;
+      }
     }
   }
 
