@@ -126,15 +126,15 @@ export class Loader {
       path = `${path}&psrType=${psrType}`
     }
     const chartName = this.config.chartNames[chartType];
+    const countryName = this.config.CountryCodes[country];
     const url = `${this.entsoeDomain}${path}&securityToken=${this.securityToke}`;
     const sources = [{
-      title: 'Entsoe data ${chartName} ${countryName}',
+      title: `Entsoe data ${chartName} ${countryName}`,
       url: `${this.entsoeDomain}${path}&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`
     }];
-    const countryName = this.config.CountryCodes[country];
 
 
-    console.log(url);
+    // console.log(url);
     const options = { headers: { 'User-Agent': 'Caching proxy for https://www.powercalculator.eu/' } }
     const response = await axios.get(url, options);
     // console.log(response);

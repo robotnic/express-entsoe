@@ -34,7 +34,6 @@ describe('Electricity consumption', () => {
       .expect(200)
       .then(response => {
         const body = response.body;
-        console.log(body);
         expect(body.chartName).toBe('Electricity Consumption')
         expect(body.unit).toBe('MW')
         expect(body.dataset.length).toBe(1)
