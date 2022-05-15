@@ -129,7 +129,7 @@ export class Loader {
     const countryName = this.config.CountryCodes[country];
     const url = `${this.entsoeDomain}${path}&securityToken=${this.securityToke}`;
     const sources = [{
-      title: `Entsoe data ${chartName} ${countryName}`,
+      title: `Entsoe Data - ${chartName} - ${countryName}`,
       url: `${this.entsoeDomain}${path}&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`
     }];
 

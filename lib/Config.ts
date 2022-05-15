@@ -323,7 +323,7 @@ export class Config {
         "X72": "blue"
       },
       chartNames: {
-        "installed": "Installed Power",
+        "installed": "Installed Electricity Generation",
         "generation": "Generated Electricity",
         "prices": "Day Ahead Prices",
         "hydrofill": "Hydro Power Fill Level",

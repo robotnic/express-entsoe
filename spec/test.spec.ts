@@ -315,7 +315,7 @@ describe('Electricity Generation', () => {
       .expect(200)
       .then(response => {
         const body = response.body;
-        expect(body.chartName).toBe('Installed Power')
+        expect(body.chartName).toBe('Installed Electricity Generation')
         expect(body.unit).toBe('MW')
         expect(body.dataset.length).toBe(12)
         expect(body.requestInterval.start).toBe('2020-01-01T00:00:00.000Z');
@@ -341,7 +341,7 @@ describe('Electricity Generation', () => {
       .expect(200)
       .then(response => {
         const body = response.body;
-        expect(body.chartName).toBe('Installed Power')
+        expect(body.chartName).toBe('Installed Electricity Generation')
         expect(body.unit).toBe('MW')
         expect(body.dataset.length).toBe(13)
         expect(body.requestInterval.start).toBe('2020-01-01T00:00:00.000Z');
