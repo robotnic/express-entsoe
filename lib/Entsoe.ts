@@ -16,7 +16,7 @@ export class Entsoe {
 
     let entsoeDomain = 'https://transparency.entsoe.eu';
     let basePath = '/entsoe';
-    let maxAge = 3600;
+    let maxAge = 0;
 
     if (entsoeConfig.basePath) {
       basePath = entsoeConfig.basePath;
@@ -47,31 +47,40 @@ export class Entsoe {
       } else {
         const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
         try {
-          const ETag = req.headers['if-none-match'];
+          let ETag = '';
+          const ETagParts = req.headers['if-none-match']?.split('/');
+          if (ETagParts?.[1]) {
+            ETag = ETagParts[1];
+          }
+          console.log(`>${ETag}<`)
           const stream = await EntsoeCache.read(fileName, entsoeConfig, ETag);
           if (!stream) {
-            res.set('etag', ETag);
+            res.set('ETag', 'W/' + ETag);
+            res.set('Last-Modified', (new Date()).toUTCString());
             return res.sendStatus(304);
           } else {
             res.set('Cache-Control', `public, max-age=${maxAge}`);
             res.set('content-type', 'application/json');
             res.set('content-encoding', 'gzip');
             if (stream.Body) {
-              res.set('etag', stream.ETag);
+              res.set('ETag', 'W/' + stream.ETag);
+              res.set('Last-Modified', (new Date()).toUTCString());
               res.end(stream.Body, 'binary')
             } else {
-              res.set('etag', stream.ETag);
+              res.set('ETag', 'W/' + stream.ETag);
+              res.set('Last-Modified', (new Date()).toUTCString());
               stream.file.pipe(res);
             }
           }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
           if (e.code !== 'NotModified') {
             //console.log('e1', e)
             next();
           } else {
             const ETag = req.headers['if-none-match'];
-            res.set('etag', ETag);
+            res.set('ETag', ETag + '');
+            // res.set('Last-Modified', (new Date()).toUTCString());
             res.set('Cache-Control', `public, max-age=${maxAge}`);
             res.sendStatus(304)
           }
@@ -215,15 +224,18 @@ export class Entsoe {
       if (req.get('accept-encoding')?.indexOf('gzip') !== -1) {
         res.set('content-type', 'application/json');
         res.set('content-encoding', 'gzip');
+        res.set('Last-Modified', (new Date()).toUTCString());
+        res.set('Cache-Control', `public, max-age=${config.maxAge}`);
         const ETag = await EntsoeCache.write(result, req.url, config);
         if (ETag) {
-          res.set('ETag', ETag);  //aws ETag
+          res.set('Last-Modified', (new Date()).toUTCString());
+          res.set('ETag', 'W/' + ETag);  //aws ETag
         }
         res.send(result);
       } else {
         res.send(data);
       }
-      EntsoeCache.write(result, req.url, config);
+      //EntsoeCache.write(result, req.url, config);
       /*
       const fileName = req.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
       const fileDirName = path.join(cacheDir, fileName);
