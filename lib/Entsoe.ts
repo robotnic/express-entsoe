@@ -52,7 +52,7 @@ export class Entsoe {
           if (ETagParts?.[1]) {
             ETag = ETagParts[1];
           }
-          console.log(`>${ETag}<`)
+          // console.log(`>${ETag}<`)
           const stream = await EntsoeCache.read(fileName, entsoeConfig, ETag);
           if (!stream) {
             res.set('ETag', 'W/' + ETag);

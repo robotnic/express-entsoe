@@ -60,6 +60,8 @@ describe('Hydrofill', () => {
         const body = response.body;
         expect(body.chartName).toBe('Hydro Power Fill Level')
         expect(body.unit).toBe('MWh')
+        expect(body.humanReadableDate).toBe('2020');
+        expect(body.title).toBe('Austria Hydro Power Fill Level 2020');
         expect(body.dataset.length).toBe(1)
         expect(body.dataset[0].data.length).toBe(53)
         body.dataset[0].data.forEach((item: any) => {

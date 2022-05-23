@@ -148,7 +148,8 @@ export class Loader {
     } else {
       [dataset, start, end] = this.convert(json.GL_MarketDocument);
     }
-    const hrDate = this.makeHrDate(new Date(start || ''), new Date(end || ''));
+    const requestInterval = this.makeRequestedPeriod(periodStart, periodEnd);
+    const hrDate = this.makeHrDate(new Date(requestInterval.start || ''), new Date(requestInterval.end || ''));
     const chartView: ChartGroup = {
       chartName: chartName,
       chartType: chartType,
@@ -156,7 +157,7 @@ export class Loader {
       countryCode: country,
       sources: sources,
       unit: unit,
-      requestInterval: this.makeRequestedPeriod(periodStart, periodEnd),
+      requestInterval: requestInterval,
       dataInterval: { start: start, end: end },
       humanReadableDate: hrDate,
       title: `${countryName} ${chartName} ${hrDate}`,
@@ -263,7 +264,7 @@ export class Loader {
     }
   }
 
-  findClosestIndex(arr: any[], element: number):number {
+  findClosestIndex(arr: any[], element: number): number {
     let from = 0, until = arr.length - 1
     while (true) {
       const cursor = Math.floor((from + until) / 2);
@@ -342,6 +343,7 @@ export class Loader {
 
 
   makeHrDate(start: Date, end: Date): string {
+    // console.log(start, end);
     const days = differenceInDays(end, start);
     let dateString = formatInTimeZone(start, 'utc', 'yyyy MMM dd')
     if (days > 2) {
