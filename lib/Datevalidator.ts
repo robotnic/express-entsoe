@@ -13,9 +13,9 @@ export class Datevalidator {
     ]
   }
 
-  static getYear(query: QueryString.ParsedQs): [string, string] {
-    const periodStart = `${query.year}01010000`;
-    const periodEnd = `${query.year}12310000`;
+  static getYear(year:string): [string, string] {
+    const periodStart = `${year}01010000`;
+    const periodEnd = `${year}12310000`;
     return [periodStart, periodEnd]
   }
 

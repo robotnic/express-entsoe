@@ -306,7 +306,7 @@ describe('Electricity Generation', () => {
         done();
       })
   })
-*/
+
   it('Installed Generation Austria 2020', done => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/installed?year=2020')
@@ -358,7 +358,7 @@ describe('Electricity Generation', () => {
         done();
       })
   })
-
+*/
 
 
 

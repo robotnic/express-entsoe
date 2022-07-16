@@ -93,9 +93,14 @@ export class Entsoe {
     router.get(`${basePath}/:country/installed`, async (req, res) => {
       const country = req.params.country;
       try {
-        const [periodStart, periodEnd] = Datevalidator.getYear(req.query);
+        if (req.query.year && typeof(req.query.year) === 'string') {
+        const [periodStart, periodEnd] = Datevalidator.getYear(req.query.year);
         const data = await loader.getInstalled(country, periodStart, periodEnd);
         this.cacheAndSend(req, res, data, entsoeConfig);
+        } else {
+        const data = await loader.getAllInstalled(country);
+        this.cacheAndSend(req, res, data, entsoeConfig);
+        }
       } catch (e: unknown) {
         if (e instanceof Error) {
           this.errorHandler(res, e);

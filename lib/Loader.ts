@@ -9,6 +9,7 @@ import { formatInTimeZone } from 'date-fns-tz';
 import { InputError, UpstreamError } from "./Errors";
 import { Country } from "./interfaces/countries";
 import { PsrType } from "./interfaces/psrTypes";
+import { Datevalidator } from "./Datevalidator";
 
 
 export class Loader {
@@ -47,6 +48,48 @@ export class Loader {
     }
     return response
   }
+
+  async getAllInstalled(country: string): Promise<ChartGroup> {
+    const fromYear = 2015;
+    const toYear = (new Date()).getFullYear();
+    const periodStart = `${fromYear}01010000`;
+    const periodEnd = `${toYear}12310000`;
+    const years = this.range(fromYear, toYear);
+    const chartType = 'installed';
+    const chartName = this.config.chartNames[chartType];
+    const countryName = this.config.CountryCodes[country];
+    const chartGroup: ChartGroup = {
+      title: `Installed ${this.config.CountryCodes[country]} ${fromYear} - ${toYear}`,
+      countryCode: country,
+      country: countryName,
+      chartType: chartType,
+      chartName: chartName,
+      humanReadableDate: `${fromYear} - ${toYear}`,
+      requestInterval: this.makeRequestedPeriod(periodStart, periodEnd),
+      dataset: [],
+      sources: []
+    }
+    for (const year of years) {
+      const [periodStart, periodEnd] = Datevalidator.getYear(year + '');
+      const charts = await this.getEntsoeData(country, 'installed', periodStart, periodEnd);
+      charts.dataset.forEach(chart => {
+        const item = chartGroup.dataset.find(item => item.psrType === chart.psrType);
+        if (!item) {
+          chartGroup.dataset.push(chart);
+        } else {
+          if (item.data && chart.data) {
+            item.data = item.data.concat(chart.data);
+          }
+        }
+      })
+      chartGroup.unit = charts.unit;
+      if (charts.sources) {
+        chartGroup.sources = chartGroup.sources?.concat(charts.sources);
+      }
+    }
+    return chartGroup;
+  }
+
   getCountries(): Country[] {
     return Object.keys(this.config.CountryCodes).map(item => {
       return {
@@ -376,5 +419,8 @@ export class Loader {
       })
 
     }
+  }
+  range(start: number, stop: number, step = 1): number[] {
+    return Array(Math.ceil((stop + 1 - start) / step)).fill(start).map((x, y) => x + y * step);
   }
 }
