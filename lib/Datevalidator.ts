@@ -19,7 +19,7 @@ export class Datevalidator {
     return [periodStart, periodEnd]
   }
 
-  static getStartEnd(query: QueryString.ParsedQs): [string, string] {
+  static getStartEnd(query: QueryString.ParsedQs, extend?:boolean): [string, string] {
     const year = this.checkYear(query.year);
     if (year) {
       let startDate = new Date(`${year}-01-01T00:00:00Z`);
@@ -45,6 +45,10 @@ export class Datevalidator {
           startDate = addDays(startDate, 1);
           endDate = addWeeks(startDate, 1);
         }
+      }
+      if (!query.month && !query.week && extend) {
+        startDate = addWeeks(startDate, -1);
+        endDate = addWeeks(endDate, 1);
       }
       const periodStart = formatInTimeZone(startDate, 'UTC', 'yyyyMMdd0000')
       const periodEnd = formatInTimeZone(endDate, 'UTC', 'yyyyMMdd0000')
@@ -111,6 +115,13 @@ export class Datevalidator {
       throw new InputError('value for week must be between 1 and 52');
     }
     return parseInt(week);
+  }
+
+  static makeIsoDate(yyyymmdd:string):string {
+    const yyyy = yyyymmdd.substring(0,4);
+    const mm = yyyymmdd.substring(5,6);
+    const dd = yyyymmdd.substring(7,8);
+    return new Date(`${yyyy}-${mm}-${dd}`).toISOString();
   }
 }
 

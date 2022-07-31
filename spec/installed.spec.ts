@@ -79,6 +79,33 @@ describe('Electricity Generation', () => {
       })
   })
 
+  it('Installed Generation Sweden all years', done => {
+    request.default(app)
+      .get('/entsoe/10YSE-1--------K/installed')
+      .set('refresh', 'true')
+      .timeout(timeout)
+      .expect(200)
+      .then(response => {
+        const body = response.body;
+        expect(body.chartName).toBe('Installed Electricity Generation')
+        expect(body.unit).toBe('MW')
+        expect(body.dataset.length).toBe(4)
+        expect(body.requestInterval.start).toBe('2015-01-01T00:00:00.000Z');
+        expect(body.requestInterval.end).toBe('2022-12-31T00:00:00.000Z');
+        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YSE-1--------K&periodStart=201501010000&periodEnd=201512310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+
+        body.dataset.forEach((dataset: any) => {
+          expect(typeof (dataset.label)).toBe('string')
+          expect(typeof (dataset.color)).toBe('string')
+          expect(typeof (dataset.psrType)).toBe('string')
+        })
+
+
+        done();
+      })
+  })
+
+
 
   it('Installed Generation France 2020', done => {
     request.default(app)

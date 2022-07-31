@@ -93,13 +93,13 @@ export class Entsoe {
     router.get(`${basePath}/:country/installed`, async (req, res) => {
       const country = req.params.country;
       try {
-        if (req.query.year && typeof(req.query.year) === 'string') {
-        const [periodStart, periodEnd] = Datevalidator.getYear(req.query.year);
-        const data = await loader.getInstalled(country, periodStart, periodEnd);
-        this.cacheAndSend(req, res, data, entsoeConfig);
+        if (req.query.year && typeof (req.query.year) === 'string') {
+          const [periodStart, periodEnd] = Datevalidator.getYear(req.query.year);
+          const data = await loader.getInstalled(country, periodStart, periodEnd);
+          this.cacheAndSend(req, res, data, entsoeConfig);
         } else {
-        const data = await loader.getAllInstalled(country);
-        this.cacheAndSend(req, res, data, entsoeConfig);
+          const data = await loader.getAllInstalled(country);
+          this.cacheAndSend(req, res, data, entsoeConfig);
         }
       } catch (e: unknown) {
         if (e instanceof Error) {
@@ -159,7 +159,7 @@ export class Entsoe {
     router.get(`${basePath}/:country/hydrofill`, async (req, res) => {
       const country = req.params.country;
       try {
-        const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query);
+        const [periodStart, periodEnd] = Datevalidator.getStartEnd(req.query, true);
         const data = await loader.getEntsoeData(country, 'hydrofill', periodStart, periodEnd);
         this.cacheAndSend(req, res, data, entsoeConfig);
       } catch (e: unknown) {

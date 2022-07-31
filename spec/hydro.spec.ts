@@ -63,17 +63,17 @@ describe('Hydrofill', () => {
         expect(body.humanReadableDate).toBe('2020');
         expect(body.title).toBe('Austria Hydro Power Fill Level 2020');
         expect(body.dataset.length).toBe(1)
-        expect(body.dataset[0].data.length).toBe(53)
+        expect(body.dataset[0].data.length).toBe(55)
         body.dataset[0].data.forEach((item: any) => {
           expect(item.y).toBeGreaterThan(0);
         })
-        expect(body.requestInterval.start).toBe('2020-01-01T00:00:00.000Z');
-        expect(body.requestInterval.end).toBe('2021-01-01T00:00:00.000Z');
+        expect(body.requestInterval.start).toBe('2019-12-25T00:00:00.000Z');
+        expect(body.requestInterval.end).toBe('2021-01-08T00:00:00.000Z');
         const startTime = new Date(body.dataInterval.start).getTime();
         const endTime = new Date(body.dataInterval.end).getTime();
         expect(startTime).toBeLessThanOrEqual((new Date('2020-01-01T00:00Z').getTime()));
         expect(endTime).toBeGreaterThanOrEqual((new Date('2021-01-01T00:00Z')).getTime() - 3600000)
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202001010000&periodEnd=202101010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=201912250000&periodEnd=202101080000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })

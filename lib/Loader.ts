@@ -71,19 +71,26 @@ export class Loader {
     }
     for (const year of years) {
       const [periodStart, periodEnd] = Datevalidator.getYear(year + '');
-      const charts = await this.getEntsoeData(country, 'installed', periodStart, periodEnd);
-      charts.dataset.forEach(chart => {
-        const item = chartGroup.dataset.find(item => item.psrType === chart.psrType);
-        if (!item) {
-          chartGroup.dataset.push(chart);
-        } else {
-          if (item.data && chart.data) {
-            item.data = item.data.concat(chart.data);
-          }
+      let charts: ChartGroup | undefined;
+      try {
+        const thecharts = await this.getEntsoeData(country, 'installed', periodStart, periodEnd);
+        if (thecharts) {
+          charts = thecharts;
         }
-      })
-      chartGroup.unit = charts.unit;
-      if (charts.sources) {
+        charts?.dataset.forEach(chart => {
+          const item = chartGroup.dataset.find(item => item.psrType === chart.psrType);
+          if (!item) {
+            chartGroup.dataset.push(chart);
+          } else {
+            if (item.data && chart.data) {
+              item.data = item.data.concat(chart.data);
+            }
+          }
+        })
+      // eslint-disable-next-line no-empty
+      } catch (e) {}
+      chartGroup.unit = 'MW'
+      if (charts?.sources) {
         chartGroup.sources = chartGroup.sources?.concat(charts.sources);
       }
     }
@@ -400,7 +407,9 @@ export class Loader {
     }
 
     if (days > 40) {
-      dateString = formatInTimeZone(start, 'utc', 'yyyy')
+      const middleTime = ((new Date(start)).getTime() + (new Date(end)).getTime()) / 2;
+      const middleDate = new Date(middleTime);
+      dateString = formatInTimeZone(middleDate, 'utc', 'yyyy')
     }
     const title = `${dateString}`;
     return title;
