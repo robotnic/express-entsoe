@@ -58,7 +58,8 @@ export class Config {
         "B22": "DC Link",
         "B23": "Substation",
         "B24": "Transformer",
-        "X72": "Hydrofill"
+        "X72": "Hydrofill",
+        "X99": "Price"
       },
       "BusinessType": {
         "A29": "Already allocated capacity (AAC)",

@@ -230,6 +230,13 @@ export class Loader {
       const durationInSeconds = this.getPeriodInSeconds(period);
       const start2 = new Date(period.timeInterval[0].start[0]);
       let psrType = timeSeries.MktPSRType?.[0].psrType[0] || 'unknown';
+      if (orig.type?.[0] === 'A65') {
+        psrType = 'A05'
+      }
+      if (orig.type?.[0] === 'A44') {
+        psrType = 'X99'
+      }
+ 
       if (psrType === 'unknown') {
         if (orig?.type?.[0] === 'A72') {
           psrType = 'X72'
@@ -269,7 +276,7 @@ export class Loader {
         const isAllZero = chartsByPsrType[key].data?.every(item => Math.abs(item.y) < 10);
         if (!isAllZero) {
           const theKey = key.split('___')[0];
-          if (key.endsWith('___in')) {
+          if (key.endsWith('___in') && !key.startsWith('A05')) {
             typeChart.label = this.config.PsrType[theKey] + ' Up';
           } else {
             typeChart.label = this.config.PsrType[theKey];

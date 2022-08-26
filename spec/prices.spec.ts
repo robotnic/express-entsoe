@@ -6,7 +6,7 @@ import { Country } from '../lib/interfaces/countries';
 
 
 
-describe('Electricity consumption', () => {
+describe('Electricity Generation', () => {
   const timeout = 120000;
 
   beforeEach(function () {
@@ -26,23 +26,23 @@ describe('Electricity consumption', () => {
   } else {
     console.log('process.env.securityToken missing')
   }
-  it('Electricity Consumption Week Germany', done => {
+  it('Price Day Austria', done => {
     request.default(app)
-      .get('/entsoe/10Y1001A1001A83F/load?year=2019&week=19')
+      .get('/entsoe/10YAT-APG------L/prices?year=2021&month=3&day=11')
       .set('refresh', 'true')
       .timeout(timeout)
       .expect(200)
       .then(response => {
         const body = response.body;
-        expect(body.chartName).toBe('Electricity Consumption')
-        expect(body.unit).toBe('MW')
+        expect(body.chartName).toBe('Day Ahead Prices')
+        expect(body.unit).toBe('€/MW')
         expect(body.dataset.length).toBe(1)
-        expect(body.dataset[0].data.length).toBe(672)
-        expect(body.dataset[0].label).toBe('Load')
-        expect(body.dataset[0].psrType).toBe('A05')
-        expect(body.requestInterval.start).toBe('2019-05-05T00:00:00.000Z')
-        expect(body.requestInterval.end).toBe('2019-05-12T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A65&processType=A16&outBiddingZone_Domain=10Y1001A1001A83F&periodStart=201905050000&periodEnd=201905120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.dataset[0].data.length).toBe(48)
+        expect(body.dataset[0].label).toBe('Price')
+        expect(body.dataset[0].psrType).toBe('X99')
+        expect(body.requestInterval.start).toBe('2021-03-11T00:00:00.000Z')
+        expect(body.requestInterval.end).toBe('2021-03-12T00:00:00.000Z');
+        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A44&in_Domain=10YAT-APG------L&out_Domain=10YAT-APG------L&periodStart=202103110000&periodEnd=202103120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })

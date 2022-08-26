@@ -213,7 +213,7 @@ describe('Electricity Generation', () => {
         done();
       })
   })
-
+/*
   it('Price Day Austria', done => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/prices?year=2021&month=3&day=11')
@@ -232,7 +232,7 @@ describe('Electricity Generation', () => {
         done();
       })
   })
-/*
+
   it('Hydro fill Month Austria Feb', done => {
     request.default(app)
       .get('/entsoe/10YAT-APG------L/hydrofill?year=2021&month=2')
