@@ -151,7 +151,7 @@ export class Loader {
         break;
       case 'generation_per_plant':
         unit = 'MW';
-        path = `/api?documentType=A73&processType=A16&in_Domain=${country}&outBiddingZone_Domain=${country}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
+        path = `/api?documentType=A73&processType=A16&in_Domain=${country}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
         break;
       case 'load':
         unit = 'MW';
@@ -229,7 +229,9 @@ export class Loader {
       const period = timeSeries.Period[0];
       const durationInSeconds = this.getPeriodInSeconds(period);
       const start2 = new Date(period.timeInterval[0].start[0]);
-      let psrType = timeSeries.MktPSRType?.[0].psrType[0] || 'unknown';
+      let psrType = timeSeries.MktPSRType?.[0]?.psrType?.[0] || 'unknown';
+      const name = timeSeries.MktPSRType?.[0].PowerSystemResources?.[0].name[0];
+
       if (orig.type?.[0] === 'A65') {
         psrType = 'A05'
       }
@@ -243,9 +245,17 @@ export class Loader {
         }
       }
       let sign = 1;
+      let label = this.config.PsrType[psrType];
       if (timeSeries['outBiddingZone_Domain.mRID']) {
-        psrType = psrType + '___in';
+        //psrType = psrType + '___in';
         sign = -1;
+        if (!psrType.startsWith('A05')) {
+          label = label + ' Up';
+        }
+      }
+      if (name) {
+        // for power per plant
+        label = name;
       }
       const data: Point[] = period.Point.map(item => {
         const x = addSeconds(start2, durationInSeconds * i++);
@@ -255,19 +265,19 @@ export class Loader {
           y: y
         }
       })
-      if (!chartsByPsrType[psrType]) {
-        chartsByPsrType[psrType] = {
-          label: '',
-          psrType: '',
+      if (!chartsByPsrType[label]) {
+        chartsByPsrType[label] = {
+          label: name || label,
+          psrType: psrType,
           data: this.makeNullValueData(start, end, durationInSeconds),
           intervalInHours: durationInSeconds / 3600
         }
       }
       if (durationInSeconds === 0) {
         // for installed
-        chartsByPsrType[psrType].data = chartsByPsrType[psrType].data?.concat(data);
+        chartsByPsrType[label].data = chartsByPsrType[label].data?.concat(data);
       } else {
-        this.fillData(chartsByPsrType[psrType].data, data);
+        this.fillData(chartsByPsrType[label].data, data);
       }
     });
     for (const key of Object.keys(chartsByPsrType)) {
@@ -275,14 +285,16 @@ export class Loader {
       if (Array.isArray(typeChart?.data)) {
         const isAllZero = chartsByPsrType[key].data?.every(item => Math.abs(item.y) < 10);
         if (!isAllZero) {
-          const theKey = key.split('___')[0];
+          const theKey = chartsByPsrType[key].psrType || '';
+          /*
           if (key.endsWith('___in') && !key.startsWith('A05')) {
             typeChart.label = this.config.PsrType[theKey] + ' Up';
           } else {
             typeChart.label = this.config.PsrType[theKey];
           }
+          */
           typeChart.color = this.config.colors[theKey];
-          typeChart.psrType = theKey;
+          //typeChart.psrType = theKey;
           charts.push(typeChart);
         }
       }

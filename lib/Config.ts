@@ -326,6 +326,7 @@ export class Config {
       chartNames: {
         "installed": "Installed Electricity Generation",
         "generation": "Generated Electricity",
+        "generation_per_plant": "Generated Electricity per Power Plant",
         "prices": "Day Ahead Prices",
         "hydrofill": "Hydro Power Fill Level",
         "load": "Electricity Consumption",

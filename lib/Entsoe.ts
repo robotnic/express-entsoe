@@ -273,7 +273,6 @@ export class Entsoe {
       return res.status(500).send('unexpected internal error');
     }
   }
-
   /*
   static async writeCachedFile(data: string, cacheDir: string, url: string): Promise<void>{
     const fileName = url.replace(/[^a-z0-9]/gi, '_').toLowerCase();

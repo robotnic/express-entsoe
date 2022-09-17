@@ -27,13 +27,22 @@ interface TimeInterval {
   end: string[]
 }
 
-interface MktPSRType {
-  psrType: string[]
+export interface MktPSRType {
+  psrType?: string[],
+  PowerSystemResources?: PowerSystemResource[]
 }
 export interface EntsoePoint {
   position: string[]
   quantity?: string[]
   'price.amount'?: string[]
+}
+
+export interface PowerSystemResource {
+  mRID: mRID[]
+  name: string[]
+}
+export interface mRID {
+  _:string
 }
 
 export interface ErrorDocument {
