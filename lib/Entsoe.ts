@@ -9,6 +9,7 @@ import { EntsoeCache } from './Cache';
 import { EntsoeConfig } from './interfaces/entsoeCache';
 import { ConfigurationOptions, config } from 'aws-sdk';
 import axios from 'axios';
+import { Eurostat } from './eurostat';
 
 
 export class Entsoe {
@@ -37,6 +38,7 @@ export class Entsoe {
     config.update(awsConfig);
 
     const loader = new Loader(entsoeConfig.securityToken, entsoeDomain);
+    const eurostat = new Eurostat();
     const router = express.Router();
 
 
@@ -206,8 +208,27 @@ export class Entsoe {
       }
     })
 
+    router.get(`${basePath}/fossil`, async (req, res) => {
+      try {
+        const year = req.query.year;
+        const country = req.query.country;
+        if (typeof (year) === 'string' && typeof (country) === 'string') {
+          const data = await eurostat.start(country, year);
+          res.set('Cache-Control', 'public, max-age=31536000');
+          this.cacheAndSend(req, res, data, entsoeConfig);
 
-    router.get(`${basePath}`, async (req, res) => {
+        } else {
+          res.status(400);
+        }
+
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          this.errorHandler(res, e);
+        }
+      }
+    })
+
+    router.get(`${basePath} `, async (req, res) => {
       try {
         const data = await CreateSwagger.load(basePath);
         res.set('Cache-Control', 'public, max-age=31536000');
@@ -230,7 +251,7 @@ export class Entsoe {
         res.set('content-type', 'application/json');
         res.set('content-encoding', 'gzip');
         res.set('Last-Modified', (new Date()).toUTCString());
-        res.set('Cache-Control', `public, max-age=${config.maxAge}`);
+        res.set('Cache-Control', `public, max - age=${ config.maxAge } `);
         const ETag = await EntsoeCache.write(result, req.url, config);
         if (ETag) {
           res.set('Last-Modified', (new Date()).toUTCString());
@@ -267,8 +288,8 @@ export class Entsoe {
     }
     console.trace(e.message);
     if (axios.isAxiosError(e)) {
-      console.log(`ENTSOE ERROR ${e.response?.status} ${e.response?.statusText}`)
-      return res.status(e.response?.status || 500).send(`ENTSOE ERROR ${e.response?.statusText}`);
+      console.log(`ENTSOE ERROR ${ e.response?.status } ${ e.response?.statusText } `)
+      return res.status(e.response?.status || 500).send(`ENTSOE ERROR ${ e.response?.statusText } `);
     } else {
       return res.status(500).send('unexpected internal error');
     }
