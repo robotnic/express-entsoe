@@ -40,7 +40,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset.length).toBe(12)
         expect(body.requestInterval.start).toBe('2020-01-01T00:00:00.000Z');
         expect(body.requestInterval.end).toBe('2020-12-31T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YAT-APG------L&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YAT-APG------L&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
 
         body.dataset.forEach((dataset: any) => {
           expect(typeof (dataset.label)).toBe('string')
@@ -66,7 +66,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset.length).toBe(12)
         expect(body.requestInterval.start).toBe('2015-01-01T00:00:00.000Z');
         expect(body.requestInterval.end).toBe('2022-12-31T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YAT-APG------L&periodStart=201501010000&periodEnd=201512310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YAT-APG------L&periodStart=201501010000&periodEnd=201512310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
 
         body.dataset.forEach((dataset: any) => {
           expect(typeof (dataset.label)).toBe('string')
@@ -92,7 +92,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset.length).toBe(4)
         expect(body.requestInterval.start).toBe('2015-01-01T00:00:00.000Z');
         expect(body.requestInterval.end).toBe('2022-12-31T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YSE-1--------K&periodStart=201501010000&periodEnd=201512310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YSE-1--------K&periodStart=201501010000&periodEnd=201512310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
 
         body.dataset.forEach((dataset: any) => {
           expect(typeof (dataset.label)).toBe('string')
@@ -120,7 +120,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset.length).toBe(13)
         expect(body.requestInterval.start).toBe('2020-01-01T00:00:00.000Z');
         expect(body.requestInterval.end).toBe('2020-12-31T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YFR-RTE------C&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YFR-RTE------C&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
 
         body.dataset.forEach((dataset: any) => {
           expect(typeof (dataset.label)).toBe('string')

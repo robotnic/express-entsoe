@@ -42,7 +42,7 @@ describe('Per Plant', () => {
         const endTime = new Date(body.dataInterval.end).getTime();
         expect(startTime).toBeLessThanOrEqual((new Date('2020-04-08T00:00Z').getTime()));
         expect(endTime).toBeGreaterThanOrEqual((new Date('2020-04-09T00:00Z')).getTime() - 3600000)
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A73&processType=A16&in_Domain=10YAT-APG------L&periodStart=202004080000&periodEnd=202004090000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A73&processType=A16&in_Domain=10YAT-APG------L&periodStart=202004080000&periodEnd=202004090000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })
