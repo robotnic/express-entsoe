@@ -45,7 +45,7 @@ describe('Hydrofill', () => {
         const endTime = new Date(body.dataInterval.end).getTime();
         expect(startTime).toBeLessThanOrEqual((new Date('2021-02-01T00:00Z').getTime()));
         expect(endTime).toBeGreaterThanOrEqual((new Date('2021-03-01T00:00Z')).getTime() - 3600000)
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202102010000&periodEnd=202103010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202102010000&periodEnd=202103010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
         done();
       })
   })
@@ -73,7 +73,7 @@ describe('Hydrofill', () => {
         const endTime = new Date(body.dataInterval.end).getTime();
         expect(startTime).toBeLessThanOrEqual((new Date('2020-01-01T00:00Z').getTime()));
         expect(endTime).toBeGreaterThanOrEqual((new Date('2021-01-01T00:00Z')).getTime() - 3600000)
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=201912250000&periodEnd=202101080000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=201912250000&periodEnd=202101080000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })
@@ -100,7 +100,7 @@ describe('Hydrofill', () => {
         const endTime = new Date(body.dataInterval.end).getTime();
         expect(startTime).toBeLessThanOrEqual((new Date('2021-03-01T00:00Z').getTime()));
         expect(endTime).toBeGreaterThanOrEqual((new Date('2021-04-01T00:00Z').getTime()))
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202103010000&periodEnd=202104010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202103010000&periodEnd=202104010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
         done();
       })
   })

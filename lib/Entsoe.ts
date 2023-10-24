@@ -15,7 +15,7 @@ import { Eurostat } from './eurostat';
 export class Entsoe {
   static init(entsoeConfig: EntsoeConfig): express.Router {
 
-    let entsoeDomain = 'https://transparency.entsoe.eu';
+    let entsoeDomain = 'https://web-api.tp.entsoe';
     let basePath = '/entsoe';
     let maxAge = 0;
 

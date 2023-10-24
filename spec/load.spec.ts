@@ -42,7 +42,7 @@ describe('Electricity consumption', () => {
         expect(body.dataset[0].psrType).toBe('A05')
         expect(body.requestInterval.start).toBe('2019-05-05T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-05-12T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A65&processType=A16&outBiddingZone_Domain=10Y1001A1001A83F&periodStart=201905050000&periodEnd=201905120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A65&processType=A16&outBiddingZone_Domain=10Y1001A1001A83F&periodStart=201905050000&periodEnd=201905120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })

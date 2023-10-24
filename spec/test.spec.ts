@@ -40,7 +40,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset[0].data.length).toBe(672)
         expect(body.requestInterval.start).toBe('2019-05-05T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-05-12T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10Y1001A1001A83F&outBiddingZone_Domain=10Y1001A1001A83F&periodStart=201905050000&periodEnd=201905120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10Y1001A1001A83F&outBiddingZone_Domain=10Y1001A1001A83F&periodStart=201905050000&periodEnd=201905120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
         done();
       })
   })
@@ -105,7 +105,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset[0].data.length).toBe(96)
         expect(body.requestInterval.start).toBe('2019-03-11T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-03-12T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10Y1001A1001A83F&outBiddingZone_Domain=10Y1001A1001A83F&periodStart=201903110000&periodEnd=201903120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10Y1001A1001A83F&outBiddingZone_Domain=10Y1001A1001A83F&periodStart=201903110000&periodEnd=201903120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })
@@ -124,7 +124,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset[0].data.length).toBe(96)
         expect(body.requestInterval.start).toBe('2019-03-11T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-03-12T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=201903110000&periodEnd=201903120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=201903110000&periodEnd=201903120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
 
         body.dataset.forEach((dataset: any) => {
           expect(typeof (dataset.label)).toBe('string')
@@ -150,7 +150,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset[0].data.length).toBe(24)
         expect(body.requestInterval.start).toBe('2019-03-11T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-03-12T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YFR-RTE------C&outBiddingZone_Domain=10YFR-RTE------C&periodStart=201903110000&periodEnd=201903120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YFR-RTE------C&outBiddingZone_Domain=10YFR-RTE------C&periodStart=201903110000&periodEnd=201903120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
 
         body.dataset.forEach((dataset: any) => {
           if (!dataset.color) {
@@ -179,7 +179,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset[0].data.length).toBe(8760)
         expect(body.requestInterval.start).toBe('2021-01-01T00:00:00.000Z');
         expect(body.requestInterval.end).toBe('2022-01-01T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YFR-RTE------C&outBiddingZone_Domain=10YFR-RTE------C&periodStart=202101010000&periodEnd=202201010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YFR-RTE------C&outBiddingZone_Domain=10YFR-RTE------C&periodStart=202101010000&periodEnd=202201010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         //console.log(body.dataset.map((item:any) => item.label))
         body.dataset.forEach((dataset: any) => {
           //console.log('---->', dataset.label, dataset.color, dataset.psrType)
@@ -209,7 +209,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset[0].data.length).toBe(72)
         expect(body.requestInterval.start).toBe('2019-03-11T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2019-03-12T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=201903110000&periodEnd=201903120000&psrType=B16&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=201903110000&periodEnd=201903120000&psrType=B16&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })
@@ -228,7 +228,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset[0].data.length).toBe(48)
         expect(body.requestInterval.start).toBe('2021-03-11T00:00:00.000Z')
         expect(body.requestInterval.end).toBe('2021-03-12T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A44&in_Domain=10YAT-APG------L&out_Domain=10YAT-APG------L&periodStart=202103110000&periodEnd=202103120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A44&in_Domain=10YAT-APG------L&out_Domain=10YAT-APG------L&periodStart=202103110000&periodEnd=202103120000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })
@@ -251,7 +251,7 @@ describe('Electricity Generation', () => {
         const endTime = new Date(body.dataInterval.end).getTime();
         expect(startTime).toBeLessThanOrEqual((new Date('2021-02-01T00:00Z').getTime()));
         expect(endTime).toBeGreaterThanOrEqual((new Date('2021-03-01T00:00Z')).getTime() - 3600000)
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202102010000&periodEnd=202103010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202102010000&periodEnd=202103010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
         done();
       })
   })
@@ -277,7 +277,7 @@ describe('Electricity Generation', () => {
         const endTime = new Date(body.dataInterval.end).getTime();
         expect(startTime).toBeLessThanOrEqual((new Date('2020-01-01T00:00Z').getTime()));
         expect(endTime).toBeGreaterThanOrEqual((new Date('2021-01-01T00:00Z')).getTime() - 3600000)
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202001010000&periodEnd=202101010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202001010000&periodEnd=202101010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
         done();
       })
   })
@@ -302,7 +302,7 @@ describe('Electricity Generation', () => {
         const endTime = new Date(body.dataInterval.end).getTime();
         expect(startTime).toBeLessThanOrEqual((new Date('2021-03-01T00:00Z').getTime()));
         expect(endTime).toBeGreaterThanOrEqual((new Date('2021-04-01T00:00Z').getTime()))
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202103010000&periodEnd=202104010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A72&processType=A16&in_Domain=10YAT-APG------L&periodStart=202103010000&periodEnd=202104010000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
         done();
       })
   })
@@ -320,7 +320,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset.length).toBe(12)
         expect(body.requestInterval.start).toBe('2020-01-01T00:00:00.000Z');
         expect(body.requestInterval.end).toBe('2020-12-31T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YAT-APG------L&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YAT-APG------L&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
 
         body.dataset.forEach((dataset: any) => {
           expect(typeof (dataset.label)).toBe('string')
@@ -346,7 +346,7 @@ describe('Electricity Generation', () => {
         expect(body.dataset.length).toBe(13)
         expect(body.requestInterval.start).toBe('2020-01-01T00:00:00.000Z');
         expect(body.requestInterval.end).toBe('2020-12-31T00:00:00.000Z');
-        expect(body.sources[0].url).toBe('https://transparency.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YFR-RTE------C&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        expect(body.sources[0].url).toBe('https://web-api.tp.entsoe.eu/api?documentType=A68&processType=A33&in_Domain=10YFR-RTE------C&periodStart=202001010000&periodEnd=202012310000&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
 
         body.dataset.forEach((dataset: any) => {
           expect(typeof (dataset.label)).toBe('string')
@@ -390,7 +390,7 @@ describe('Electricity Generation', () => {
         expect(body.title).toBe('No data from ENTSO-e')
         expect(body.status).toBe(404)
         expect(body.detail).toBe('No matching data found for Data item Aggregated Generation per Type [16.1.B&C] (10YAT-APG------L) and interval 3000-03-11T00:00:00.000Z/3000-03-12T00:00:00.000Z.')
-        expect(body.instance).toBe('https://transparency.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=300003110000&periodEnd=300003120000&psrType=B16&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+        expect(body.instance).toBe('https://web-api.tp.entsoe.eu/api?documentType=A75&processType=A16&in_Domain=10YAT-APG------L&outBiddingZone_Domain=10YAT-APG------L&periodStart=300003110000&periodEnd=300003120000&psrType=B16&securityToken=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
         done();
       })
   })
